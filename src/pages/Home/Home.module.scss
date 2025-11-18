@@ -1,0 +1,123 @@
+@use "sass:color";
+@use "../../styles/base/variables" as *;
+@use "../../styles/base/mixins" as *;
+
+.home {
+  min-height: 100vh;
+  @include flex-column-center;
+  padding: $spacing-xl;
+  background: radial-gradient(
+      ellipse at top left,
+      rgba(100, 130, 150, 0.03) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      ellipse at bottom right,
+      rgba(80, 110, 130, 0.03) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      circle at 50% 50%,
+      rgba(255, 255, 255, 0.01) 0%,
+      transparent 100%
+    ),
+    $bg-primary;
+}
+
+.container {
+  max-width: 800px;
+  width: 100%;
+  @include flex-column-center;
+  gap: $spacing-xxl;
+  @include fade-in;
+}
+
+.header {
+  text-align: center;
+  @include flex-column;
+  gap: $spacing-md;
+}
+
+.title {
+  @include flex-column;
+  gap: $spacing-sm;
+
+  .titleMain {
+    font-family: $font-display;
+    font-size: clamp(48px, 8vw, 72px);
+    font-weight: $font-weight-bold;
+    letter-spacing: 8px;
+    background: linear-gradient(135deg, #e8e8e8 0%, #a0a0a0 50%, #c0c0c0 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-transform: uppercase;
+    text-shadow: 0 2px 20px rgba(255, 255, 255, 0.1);
+  }
+
+  .titleSub {
+    font-family: $font-display;
+    font-size: clamp(20px, 3vw, 28px);
+    font-weight: $font-weight-medium;
+    color: rgba($text-secondary, 0.7);
+    letter-spacing: 4px;
+    text-transform: uppercase;
+  }
+}
+
+.subtitle {
+  font-size: $font-size-lg;
+  color: $text-secondary;
+  max-width: 500px;
+  line-height: $line-height-relaxed;
+}
+
+.stonesPreview {
+  display: flex;
+  gap: $spacing-md;
+  flex-wrap: wrap;
+  justify-content: center;
+  padding: $spacing-xl 0;
+
+  > * {
+    @include scale-in;
+
+    @for $i from 1 through 6 {
+      &:nth-child(#{$i}) {
+        animation-delay: #{$i * 0.1}s;
+      }
+    }
+  }
+}
+
+.actions {
+  @include flex-column;
+  gap: $spacing-md;
+  width: 100%;
+  max-width: 400px;
+
+  button {
+    width: 100%;
+  }
+}
+
+.footer {
+  margin-top: $spacing-xl;
+  text-align: center;
+  color: $text-disabled;
+  font-size: $font-size-sm;
+}
+
+@include respond-to("mobile") {
+  .home {
+    padding: $spacing-lg;
+  }
+
+  .container {
+    gap: $spacing-xl;
+  }
+
+  .stonesPreview {
+    gap: $spacing-sm;
+  }
+}

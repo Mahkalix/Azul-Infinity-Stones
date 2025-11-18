@@ -380,6 +380,16 @@ $font-family-display: $font-display;
 $font-family-body: $font-primary;
 $font-family-mono: $font-mono;
 
+// Aliases for compatibility
+$font-body: $font-primary;
+$font-display: $font-display;
+$border-radius-sm: $radius-sm;
+$border-radius-md: $radius-md;
+$border-radius-lg: $radius-lg;
+$primary-blue: $space-primary;
+$primary-purple: $power-primary;
+$surface-secondary: $bg-secondary;
+
 $font-size-2xl: $font-size-xxl;
 $font-size-3xl: $font-size-xxxl;
 $font-size-4xl: 40px;
