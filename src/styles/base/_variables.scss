@@ -1,0 +1,398 @@
+/**
+ * Variables SCSS - Infinity Stones Theme
+ */
+
+@use "sass:color";
+
+// ========================================
+// Infinity Stones Colors
+// ========================================
+
+$space-primary: #4da6ff;
+$space-glow: #1e90ff;
+
+$mind-primary: #ffd700;
+$mind-glow: #ffea00;
+
+$reality-primary: #ff4444;
+$reality-glow: #ff0000;
+
+$power-primary: #a020f0;
+$power-glow: #bf00ff;
+
+$time-primary: #00ff88;
+$time-glow: #00ffaa;
+
+$soul-primary: #ff8c00;
+$soul-glow: #ffa500;
+
+// Map pour itérer facilement
+$stones: (
+  "space": (
+    $space-primary,
+    $space-glow,
+  ),
+  "mind": (
+    $mind-primary,
+    $mind-glow,
+  ),
+  "reality": (
+    $reality-primary,
+    $reality-glow,
+  ),
+  "power": (
+    $power-primary,
+    $power-glow,
+  ),
+  "time": (
+    $time-primary,
+    $time-glow,
+  ),
+  "soul": (
+    $soul-primary,
+    $soul-glow,
+  ),
+);
+
+// ========================================
+// Background Colors (Stark Industries Theme)
+// ========================================
+
+$bg-primary: #1a1d23;
+$bg-secondary: #23262d;
+$bg-tertiary: #2d3139;
+$bg-elevated: #363a43;
+$bg-panel: #1f2229;
+
+// ========================================
+// Semantic Colors
+// ========================================
+
+$success: #0ac776;
+$warning: #f0b232;
+$danger: #d13639;
+$info: #1f8ecd;
+
+$accent-primary: #c89b3c;
+$accent-secondary: #785a28;
+$accent-gold: #f0e6d2;
+$accent-blue: #0bc6e3;
+
+// ========================================
+// Text Colors
+// ========================================
+
+$text-primary: #e8e8e8;
+$text-secondary: #a0a0a0;
+$text-disabled: #606060;
+$text-accent: #c89b3c;
+
+// ========================================
+// Border Colors
+// ========================================
+
+$border-color: #1e2328;
+$border-glow: #c89b3c;
+$border-light: rgba(200, 155, 60, 0.2);
+$border-dark: #010a13;
+
+// ========================================
+// Shadows
+// ========================================
+
+$shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.6);
+$shadow-md: 0 4px 16px rgba(0, 0, 0, 0.7);
+$shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.8);
+$shadow-gold: 0 0 20px rgba(200, 155, 60, 0.4);
+$shadow-inset: inset 0 1px 0 rgba(200, 155, 60, 0.1);
+
+// ========================================
+// Spacing
+// ========================================
+
+$spacing-xs: 4px;
+$spacing-sm: 8px;
+$spacing-md: 16px;
+$spacing-lg: 24px;
+$spacing-xl: 32px;
+$spacing-xxl: 48px;
+$spacing-xxxl: 64px;
+
+// ========================================
+// Border Radius
+// ========================================
+
+$radius-sm: 4px;
+$radius-md: 8px;
+$radius-lg: 12px;
+$radius-xl: 16px;
+$radius-round: 50%;
+
+// ========================================
+// Typography
+// ========================================
+
+$font-primary: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+  sans-serif;
+$font-display: "Orbitron", "Roboto Condensed", sans-serif;
+$font-mono: "Fira Code", "Consolas", monospace;
+
+$font-size-xs: 12px;
+$font-size-sm: 14px;
+$font-size-base: 16px;
+$font-size-lg: 18px;
+$font-size-xl: 24px;
+$font-size-xxl: 32px;
+$font-size-xxxl: 48px;
+
+$font-weight-light: 300;
+$font-weight-normal: 400;
+$font-weight-medium: 500;
+$font-weight-semibold: 600;
+$font-weight-bold: 700;
+
+$line-height-tight: 1.2;
+$line-height-normal: 1.5;
+$line-height-relaxed: 1.75;
+
+// ========================================
+// Transitions
+// ========================================
+
+$transition-fast: 0.15s;
+$transition-normal: 0.3s;
+$transition-slow: 0.5s;
+
+$transition-base: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+$easing-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+$easing-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+$easing-in: cubic-bezier(0.4, 0, 1, 1);
+$easing-out: cubic-bezier(0, 0, 0.2, 1);
+
+// ========================================
+// Z-Index
+// ========================================
+
+$z-base: 1;
+$z-dropdown: 100;
+$z-sticky: 200;
+$z-overlay: 300;
+$z-modal: 400;
+$z-popover: 500;
+$z-tooltip: 600;
+
+// ========================================
+// Breakpoints
+// ========================================
+
+$breakpoint-mobile: 640px;
+$breakpoint-tablet: 768px;
+$breakpoint-desktop: 1024px;
+$breakpoint-wide: 1280px;
+$breakpoint-ultra: 1536px;
+
+$mobile: $breakpoint-mobile;
+$tablet: $breakpoint-tablet;
+$laptop: $breakpoint-desktop;
+$desktop: $breakpoint-wide;
+
+// ========================================
+// Game Specific
+// ========================================
+
+$tile-size-sm: 28px;
+$tile-size-md: 42px;
+$tile-size-lg: 56px;
+
+$factory-size: 200px;
+$center-pool-size: 300px;
+
+$wall-cell-size: 50px;
+$pattern-line-cell-size: 45px;
+$floor-line-cell-size: 40px;
+
+// ========================================
+// Glassmorphism (compatibilité)
+// ========================================
+
+$glass-bg: rgba(255, 255, 255, 0.03);
+$glass-border: rgba(200, 155, 60, 0.2);
+$glass-hover: rgba(255, 255, 255, 0.08);
+
+$text-muted: $text-secondary;
+$bg-card: $bg-tertiary;
+$bg-hover: $bg-elevated;
+
+$border-medium: rgba(200, 155, 60, 0.3);
+$border-strong: rgba(200, 155, 60, 0.4);
+
+$shadow-light: $shadow-sm;
+$shadow-medium: $shadow-md;
+$shadow-strong: $shadow-lg;
+
+$accent-danger: $danger;
+$accent-warning: $warning;
+$accent-success: $success;
+
+// ========================================
+// Compatibility stones
+// ========================================
+
+$stone-space: $space-primary;
+$stone-space-dark: color.scale($space-primary, $lightness: -15%);
+$stone-space-light: color.scale($space-primary, $lightness: 15%);
+
+$stone-mind: $mind-primary;
+$stone-mind-dark: color.scale($mind-primary, $lightness: -15%);
+$stone-mind-light: color.scale($mind-primary, $lightness: 15%);
+
+$stone-reality: $reality-primary;
+$stone-reality-dark: color.scale($reality-primary, $lightness: -15%);
+$stone-reality-light: color.scale($reality-primary, $lightness: 15%);
+
+$stone-power: $power-primary;
+$stone-power-dark: color.scale($power-primary, $lightness: -15%);
+$stone-power-light: color.scale($power-primary, $lightness: 15%);
+
+$stone-time: $time-primary;
+$stone-time-dark: color.scale($time-primary, $lightness: -15%);
+$stone-time-light: color.scale($time-primary, $lightness: 15%);
+
+$stone-soul: $soul-primary;
+$stone-soul-dark: color.scale($soul-primary, $lightness: -15%);
+$stone-soul-light: color.scale($soul-primary, $lightness: 15%);
+
+// ========================================
+// Glows Infinity Stones
+// ========================================
+
+$glow-space: 0 0 20px rgba($space-glow, 0.5), 0 0 40px rgba($space-glow, 0.3);
+$glow-mind: 0 0 20px rgba($mind-glow, 0.5), 0 0 40px rgba($mind-glow, 0.3);
+$glow-reality: 0 0 20px rgba($reality-glow, 0.5),
+  0 0 40px rgba($reality-glow, 0.3);
+$glow-power: 0 0 20px rgba($power-glow, 0.5), 0 0 40px rgba($power-glow, 0.3);
+$glow-soul: 0 0 20px rgba($soul-glow, 0.5), 0 0 40px rgba($soul-glow, 0.3);
+$glow-time: 0 0 20px rgba($time-glow, 0.5), 0 0 40px rgba($time-glow, 0.3);
+
+$glow-arc: 0 0 20px rgba($accent-blue, 0.5), 0 0 40px rgba($accent-blue, 0.2);
+$glow-vibranium: 0 0 20px rgba($power-glow, 0.6),
+  0 0 40px rgba($power-primary, 0.4);
+$glow-gold: $shadow-gold;
+
+// ========================================
+// Gradients
+// ========================================
+
+$gradient-space: linear-gradient(
+  135deg,
+  color.scale($space-primary, $lightness: -15%),
+  $space-primary
+);
+$gradient-mind: linear-gradient(
+  135deg,
+  color.scale($mind-primary, $lightness: -15%),
+  $mind-primary
+);
+$gradient-reality: linear-gradient(
+  135deg,
+  color.scale($reality-primary, $lightness: -15%),
+  $reality-primary
+);
+$gradient-power: linear-gradient(
+  135deg,
+  color.scale($power-primary, $lightness: -15%),
+  $power-primary
+);
+$gradient-soul: linear-gradient(
+  135deg,
+  color.scale($soul-primary, $lightness: -15%),
+  $soul-primary
+);
+$gradient-time: linear-gradient(
+  135deg,
+  color.scale($time-primary, $lightness: -15%),
+  $time-primary
+);
+
+$gradient-infinity: linear-gradient(
+  135deg,
+  $space-primary 0%,
+  $power-primary 25%,
+  $reality-primary 50%,
+  $soul-primary 75%,
+  $mind-primary 100%
+);
+$gradient-vibranium: linear-gradient(
+  135deg,
+  $power-primary,
+  $power-glow,
+  color.scale($power-primary, $lightness: 10%)
+);
+$gradient-arc: linear-gradient(
+  135deg,
+  $accent-blue,
+  color.scale($accent-blue, $lightness: 10%)
+);
+$gradient-dark: linear-gradient(135deg, $bg-primary, $bg-secondary);
+
+// ========================================
+// Autres variables compatibilité
+// ========================================
+
+$shadow-glass: $shadow-md;
+$shadow-hover: $shadow-gold;
+
+$radius-portal: $radius-round;
+$radius-full: 9999px;
+$radius-2xl: 32px;
+
+$arc-blue: $accent-blue;
+$arc-cyan: color.scale($accent-blue, $lightness: 10%);
+$arc-glow: rgba($accent-blue, 0.5);
+
+$vibranium-base: $power-primary;
+$vibranium-glow: $power-glow;
+$vibranium-light: color.scale($power-primary, $lightness: 10%);
+
+$space-0: 0;
+$space-1: $spacing-xs;
+$space-2: $spacing-sm;
+$space-3: 12px;
+$space-4: $spacing-md;
+$space-5: 20px;
+$space-6: $spacing-lg;
+$space-8: $spacing-xl;
+$space-10: 40px;
+$space-12: $spacing-xxl;
+$space-16: $spacing-xxxl;
+$space-20: 80px;
+$space-24: 96px;
+
+$blur-sm: blur(4px);
+$blur-base: blur(8px);
+$blur-md: blur(12px);
+$blur-lg: blur(16px);
+$blur-xl: blur(24px);
+$blur-stark: blur(20px) saturate(180%);
+
+$font-family-display: $font-display;
+$font-family-body: $font-primary;
+$font-family-mono: $font-mono;
+
+$font-size-2xl: $font-size-xxl;
+$font-size-3xl: $font-size-xxxl;
+$font-size-4xl: 40px;
+$font-size-5xl: 48px;
+$font-size-6xl: 64px;
+
+$font-weight-extrabold: 800;
+$font-weight-black: 900;
+
+$transition-faster: $transition-fast;
+$transition-base-timing: $easing-smooth;
+$transition-slower: $transition-slow;
+$ease-in-out: $easing-smooth;
+$ease-bounce: $easing-bounce;
+
+$wide: $breakpoint-wide;
