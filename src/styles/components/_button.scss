@@ -2,7 +2,6 @@
 // Button Component Styles (Global)
 // ============================================
 
-@use "sass:color";
 @use "../base/variables" as *;
 
 .c-btn {
@@ -29,16 +28,16 @@
 
   // Modificateurs de style
   &--primary {
-    background: $glass-bg;
+    background: rgba(255, 255, 255, 0.03);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     color: $text-primary;
-    border-color: $glass-border;
-    box-shadow: $shadow-glass;
+    border-color: rgba($color-accent, 0.2);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.7);
 
     &:hover:not(:disabled) {
       transform: translateY(-4px) scale(1.02);
-      background: $glass-hover;
+      background: rgba(255, 255, 255, 0.08);
       box-shadow: 0 12px 48px 0 rgba($text-primary, 0.2);
     }
 
@@ -48,16 +47,16 @@
   }
 
   &--secondary {
-    background: $bg-card;
+    background: $bg-secondary;
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     color: $text-primary;
-    border-color: $glass-border;
+    border-color: rgba($color-accent, 0.2);
 
     &:hover:not(:disabled) {
       transform: translateY(-4px) scale(1.02);
-      background: $glass-hover;
-      border-color: $border-medium;
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba($color-accent, 0.3);
     }
 
     &:active:not(:disabled) {
@@ -67,14 +66,15 @@
 
   &--outline {
     background: transparent;
-    color: $space-primary;
-    border: 2px solid rgba($space-primary, 0.8);
+    color: $color-space;
+    border: 2px solid rgba($color-space, 0.8);
 
     &:hover:not(:disabled) {
-      background: rgba($space-primary, 0.1);
-      border-color: $space-primary;
+      background: rgba($color-space, 0.1);
+      border-color: $color-space;
       transform: translateY(-2px);
-      box-shadow: $glow-space;
+      box-shadow: 0 0 20px rgba($color-space, 0.5),
+        0 0 40px rgba($color-space, 0.3);
     }
   }
 
@@ -89,15 +89,15 @@
   }
 
   &--danger {
-    background: rgba($accent-danger, 0.2);
+    background: rgba($color-danger, 0.2);
     backdrop-filter: blur(20px);
-    color: color.scale($accent-danger, $lightness: 20%);
-    border-color: rgba($accent-danger, 0.3);
-    box-shadow: $shadow-glass;
+    color: $color-danger;
+    border-color: rgba($color-danger, 0.3);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.7);
 
     &:hover:not(:disabled) {
       transform: translateY(-4px) scale(1.02);
-      background: rgba($accent-danger, 0.3);
+      background: rgba($color-danger, 0.3);
     }
   }
 
@@ -111,12 +111,12 @@
     font-size: 1.25rem;
     padding: 1.25rem 2.5rem;
 
-    @media (min-width: $tablet) {
+    @media (min-width: 768px) {
       font-size: 1.375rem;
       padding: 1.375rem 3rem;
     }
 
-    @media (min-width: $laptop) {
+    @media (min-width: 1024px) {
       font-size: 1.5rem;
       padding: 1.5rem 4rem;
     }

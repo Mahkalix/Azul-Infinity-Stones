@@ -1,7 +1,4 @@
-/**
- * Mixins SCSS - Utilities
- * Note: Préférer utiliser directement les propriétés CSS quand possible
- */
+//mixins
 
 @use "sass:color";
 @use "./variables" as *;
@@ -42,7 +39,7 @@
 
 // Transitions
 @mixin smooth-transition($property: all) {
-  transition: $property $transition-base;
+  transition: $property $transition-normal cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 // Glow effects
@@ -67,15 +64,15 @@
 // Media queries
 @mixin respond-to($breakpoint) {
   @if $breakpoint == "mobile" {
-    @media (max-width: $mobile) {
+    @media (max-width: $breakpoint-mobile) {
       @content;
     }
   } @else if $breakpoint == "tablet" {
-    @media (min-width: $mobile) and (max-width: $laptop) {
+    @media (min-width: $breakpoint-mobile) and (max-width: 1024px) {
       @content;
     }
   } @else if $breakpoint == "laptop" {
-    @media (min-width: $laptop) {
+    @media (min-width: 1024px) {
       @content;
     }
   }

@@ -9,11 +9,11 @@ export const STONE_TYPES = {
 
 // Stone colors mapping
 export const STONE_COLORS = {
-  [STONE_TYPES.SPACE]: '#5271ff',
+  [STONE_TYPES.SPACE]: '#4da6ff',
   [STONE_TYPES.MIND]: '#ff8c00',
-  [STONE_TYPES.REALITY]: '#ff0000',
-  [STONE_TYPES.POWER]: '#9b59b6',
-  [STONE_TYPES.TIME]: '#00ff00'
+  [STONE_TYPES.REALITY]: '#ff4444',
+  [STONE_TYPES.POWER]: '#a020f0',
+  [STONE_TYPES.TIME]: '#00ff88'
 };
 
 // Game constants

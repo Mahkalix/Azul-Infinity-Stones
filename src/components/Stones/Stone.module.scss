@@ -3,8 +3,8 @@
 
 .stone {
   position: relative;
-  border-radius: $border-radius-sm;
-  transition: all 0.3s ease;
+  border-radius: $radius-sm;
+  transition: all $transition-normal ease;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -19,7 +19,7 @@
       rgba(255, 255, 255, 0.3) 0%,
       transparent 70%
     );
-    border-radius: $border-radius-sm;
+    border-radius: $radius-sm;
     pointer-events: none;
     animation: shine 2s ease-in-out infinite;
   }
@@ -41,7 +41,7 @@
   object-fit: contain;
   position: relative;
   z-index: 1;
-  transition: filter 0.3s ease;
+  transition: filter $transition-normal ease;
 }
 
 .stone:hover .stoneImage {
@@ -51,10 +51,10 @@
 .glow {
   position: absolute;
   inset: -4px;
-  border-radius: $border-radius-sm;
+  border-radius: $radius-sm;
   opacity: 0;
   filter: blur(10px);
-  transition: opacity 0.3s ease;
+  transition: opacity $transition-normal ease;
   z-index: -1;
 }
 

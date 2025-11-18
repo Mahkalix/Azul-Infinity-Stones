@@ -18,14 +18,14 @@ export const Button = ({
       onClick={onClick}
       disabled={disabled}
     >
-      {children}
+      <span>{children}</span>
     </button>
   );
 };
 
 Button.propTypes = {
   children: PropTypes.node.isRequired,
-  variant: PropTypes.oneOf(["primary", "secondary", "ghost"]),
+  variant: PropTypes.oneOf(["primary", "secondary", "ghost", "gold"]),
   size: PropTypes.oneOf(["small", "medium", "large"]),
   onClick: PropTypes.func,
   disabled: PropTypes.bool,
