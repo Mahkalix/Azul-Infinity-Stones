@@ -4,18 +4,16 @@ export const STONE_TYPES = {
   MIND: 'MIND',
   REALITY: 'REALITY',
   POWER: 'POWER',
-  TIME: 'TIME',
-  SOUL: 'SOUL'
+  TIME: 'TIME'
 };
 
 // Stone colors mapping
 export const STONE_COLORS = {
   [STONE_TYPES.SPACE]: '#5271ff',
-  [STONE_TYPES.MIND]: '#ffd700',
+  [STONE_TYPES.MIND]: '#ff8c00',
   [STONE_TYPES.REALITY]: '#ff0000',
   [STONE_TYPES.POWER]: '#9b59b6',
-  [STONE_TYPES.TIME]: '#00ff00',
-  [STONE_TYPES.SOUL]: '#ff8c00'
+  [STONE_TYPES.TIME]: '#00ff00'
 };
 
 // Game constants

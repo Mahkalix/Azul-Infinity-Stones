@@ -1,7 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "../../components/Button";
-import { Tile } from "../../components/game/Tile";
+import { Stone } from "../../components/Stones";
 import { STONE_TYPES } from "../../constants";
 import styles from "./Home.module.scss";
 
@@ -32,7 +32,7 @@ const Home = () => {
 
         <div className={styles.stonesPreview}>
           {Object.values(STONE_TYPES).map((stone) => (
-            <Tile key={stone} stoneType={stone} size="large" />
+            <Stone key={stone} stoneType={stone} size="large" />
           ))}
         </div>
 
