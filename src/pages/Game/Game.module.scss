@@ -1,101 +1,157 @@
 @use "../../styles/base/variables" as *;
 
 .gameContainer {
-    background: $bg-primary;
     min-height: 100vh;
+    background: $bg-primary;
     color: white;
     padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
-.mainContent {
+.mainLayout {
+    width: 100%;
+    max-width: 1400px;
     display: flex;
     flex-direction: column;
     gap: 40px;
 }
 
+// --- SECTION FABRIQUES ---
 .factories {
     display: flex;
     flex-wrap: wrap;
-    gap: 20px;
+    gap: 30px;
     justify-content: center;
+    padding: 20px;
 }
 
 .factory {
-    width: 120px;
-    height: 120px;
-    border: 2px solid $color-primary;
+    width: 140px;
+    height: 140px;
     border-radius: 50%;
-    display: flex;
-    flex-wrap: wrap;
-    padding: 10px;
+    border: 3px solid $color-primary;
+    background: radial-gradient(circle, rgba($bg-secondary, 0.8) 0%, rgba(0, 0, 0, 0.6) 100%);
+    box-shadow: 0 0 15px rgba($color-primary, 0.3);
+
+    // Alignement des 4 pierres en carré au centre du cercle
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 5px;
+    padding: 25px; // Ajustez le padding pour que les pierres ne touchent pas les bords
     align-items: center;
-    justify-content: center;
+    justify-items: center;
+
     cursor: pointer;
+    transition: all 0.3s ease;
+
+    &:hover {
+        transform: scale(1.05);
+        box-shadow: 0 0 25px rgba($color-primary, 0.5);
+        border-color: $color-primary-light;
+    }
 }
 
+// --- SECTION CENTRE ---
 .center {
-    min-height: 80px;
-    border: 1px dashed white;
-    margin-top: 20px;
+    min-height: 100px;
+    width: 80%;
+    margin: 0 auto;
+    border: 2px dashed rgba($color-primary, 0.4);
+    border-radius: $radius-lg;
     display: flex;
     flex-wrap: wrap;
-    gap: 10px;
-    padding: 10px;
+    gap: 12px;
+    padding: 20px;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.02);
 }
 
-.players {
+// --- SECTION PLATEAUX ---
+.playersContainer {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 20px;
+    gap: 40px;
 }
 
 .playerBoard {
-    padding: 15px;
+    padding: 25px;
+    border-radius: $radius-xl;
+    background: rgba($bg-secondary, 0.7);
     border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: border-color 0.3s;
+
     &.active {
-        border-color: $color-primary;
-        box-shadow: 0 0 10px $color-primary;
+        border: 2px solid $color-primary;
+        box-shadow: 0 0 20px rgba($color-primary, 0.2);
     }
 }
 
 .boardGrid {
     display: flex;
-    gap: 20px;
     justify-content: space-between;
+    margin-top: 25px;
 }
 
+// Lignes de motif (Pattern Lines)
 .line {
     display: flex;
-    flex-direction: row-reverse;
-    gap: 5px;
-    margin-bottom: 5px;
+    flex-direction: row-reverse; // Pour remplir de droite à gauche
+    gap: 8px;
+    margin-bottom: 12px;
+    height: 45px;
     cursor: pointer;
 }
 
 .slot,
 .cell,
 .floorSlot {
-    width: 35px;
-    height: 35px;
+    width: 40px;
+    height: 40px;
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: $radius-sm;
 }
 
 .row {
     display: flex;
-    gap: 5px;
-    margin-bottom: 5px;
+    gap: 8px;
+    margin-bottom: 8px;
 }
 
+// Ligne de plancher
 .floor {
     display: flex;
-    gap: 5px;
-    margin-top: 20px;
+    gap: 10px;
+    margin-top: 30px;
+    justify-content: center;
+
     .floorSlot {
-        font-size: 10px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: $color-danger;
+        position: relative;
+        border-color: rgba($color-danger, 0.3);
+
+        .penalty {
+            position: absolute;
+            bottom: -18px;
+            font-size: 11px;
+            color: $color-danger;
+            font-weight: bold;
+        }
     }
+}
+
+// Overlay de fin
+.gameOverOverlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
 }

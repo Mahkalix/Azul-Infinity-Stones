@@ -1,21 +1,36 @@
 import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { Stone } from '../../components/Stones';
 import { initGame, pickFromFactory, pickFromCenter, placeStones } from '../../store/gameSlice';
 import styles from './Game.module.scss';
 
 const Game = () => {
     const dispatch = useDispatch();
-    const { factories, center, players, currentPlayerId, heldStones } = useSelector(state => state.game);
+    const navigate = useNavigate();
+    const { factories, center, players, currentPlayerId, heldStones, gameState } = useSelector(state => state.game);
 
     useEffect(() => { if (players.length === 0) dispatch(initGame()); }, [dispatch, players]);
 
-    if (players.length === 0) return <div className={styles.loading}>Chargement du Gant...</div>;
+    if (players.length === 0) return null;
+
+    if (gameState === "GAME_OVER") {
+        const winner = [...players].sort((a, b) => b.score - a.score)[0];
+        return (
+            <div className={styles.gameOverOverlay}>
+                <div className={styles.modal}>
+                    <h2>FIN DE LA QUÊTE</h2>
+                    <h3>Le Joueur {winner.id} a réuni les pierres !</h3>
+                    <button onClick={() => navigate('/')} className={styles.restartBtn}>Menu Principal</button>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className={styles.gameContainer}>
             <header className={styles.header}>
-                <h1>Tour : Joueur {currentPlayerId}</h1>
+                <h1>TOUR : JOUEUR {currentPlayerId}</h1>
                 {heldStones && (
                     <div className={styles.hand}>
                         En main : {heldStones.count}x <Stone stoneType={heldStones.type} size="small" />
@@ -23,8 +38,8 @@ const Game = () => {
                 )}
             </header>
 
-            <div className={styles.mainContent}>
-                <section className={styles.supply}>
+            <main className={styles.mainLayout}>
+                <section className={styles.commonArea}>
                     <div className={styles.factories}>
                         {factories.map((stones, i) => (
                             <div key={i} className={styles.factory}>
@@ -36,7 +51,7 @@ const Game = () => {
                             </div>
                         ))}
                     </div>
-                    <div className={styles.center} onClick={() => console.log("Clic centre")}>
+                    <div className={styles.center} onClick={() => !heldStones && center.length > 0 && console.log("Choisissez une couleur")}>
                         {center.map((s, i) => (
                             <div key={i} onClick={(e) => { e.stopPropagation(); if (!heldStones) dispatch(pickFromCenter({ stoneType: s })); }}>
                                 <Stone stoneType={s} size="small" />
@@ -45,10 +60,10 @@ const Game = () => {
                     </div>
                 </section>
 
-                <section className={styles.players}>
+                <section className={styles.playersContainer}>
                     {players.map(p => (
                         <div key={p.id} className={`${styles.playerBoard} ${currentPlayerId === p.id ? styles.active : ''}`}>
-                            <h3>Joueur {p.id} - Score: {p.score}</h3>
+                            <h3>Joueur {p.id} | Score: {p.score}</h3>
                             <div className={styles.boardGrid}>
                                 <div className={styles.patterns}>
                                     {p.patternLines.map((line, i) => (
@@ -68,14 +83,15 @@ const Game = () => {
                             <div className={styles.floor}>
                                 {Array(7).fill(null).map((_, i) => (
                                     <div key={i} className={styles.floorSlot}>
-                                        {p.floorLine[i] === "FIRST_PLAYER" ? "1st" : p.floorLine[i] && <Stone stoneType={p.floorLine[i]} size="small" />}
+                                        <span className={styles.penalty}>{-1 * (i < 2 ? 1 : i < 5 ? 2 : 3)}</span>
+                                        {p.floorLine[i] === "FIRST_PLAYER" ? <div className={styles.firstMarker}>1st</div> : p.floorLine[i] && <Stone stoneType={p.floorLine[i]} size="small" />}
                                     </div>
                                 ))}
                             </div>
                         </div>
                     ))}
                 </section>
-            </div>
+            </main>
         </div>
     );
 };
