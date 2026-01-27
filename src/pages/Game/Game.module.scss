@@ -115,20 +115,19 @@
         transform: scale(1.05);
     }
 
-    // --- ADAPTATION MOBILE ---
     @media (max-width: 768px) {
-        width: 120px !important; // On réduit la fabrique pour que 15px paraissent bien
+        width: 120px !important;
         height: 120px !important;
-        padding: 10px !important; // On réduit le padding au strict minimum
-        gap: 2px !important; // On colle les pierres pour gagner de la place
+        padding: 10px !important;
+        gap: 2px !important;
 
         img,
         svg,
         .gem,
         div[class*="tile"] {
-            width: 20px !important; // TAILLE DEMANDÉE
-            height: 20px !important; // TAILLE DEMANDÉE
-            flex-shrink: 0 !important; // Empêche l'écrasement
+            width: 20px !important;
+            height: 20px !important;
+            flex-shrink: 0 !important;
         }
     }
 }
@@ -178,7 +177,7 @@
 .boardGrid {
     display: flex;
     justify-content: center;
-    gap: 25px; // Espace entre les motifs et le mur
+    gap: 25px;
     margin-top: 10px;
 }
 
@@ -186,14 +185,13 @@
 .patterns {
     display: flex;
     flex-direction: column;
-    gap: 8px; // Doit être identique au gap du mur
+    gap: 8px;
 }
 
-// Lignes de motif (Pattern Lines)
 .line {
-    height: 40px; // Même hauteur que les cellules du mur
+    height: 40px;
     display: flex;
-    justify-content: flex-end; // Pousse les cases vers la droite (contre le mur)
+    justify-content: flex-end;
     cursor: pointer;
 
     .lineSlots {
@@ -231,9 +229,24 @@
     transition: all 0.2s ease;
 }
 
-.cell.filled {
+.cell {
+    position: relative;
+
+    .ghost {
+        opacity: 0.5;
+        filter: grayscale(0.8) brightness(0.8);
+        transform: scale(0.85);
+        pointer-events: none;
+    }
+
+    &.filled {
     border-color: rgba(255, 255, 255, 0.3);
     background: rgba(255, 255, 255, 0.1);
+
+        .ghost {
+            display: none;
+        }
+    }
 }
 
 // --- LIGNE DE PLANCHER ---
@@ -308,6 +321,23 @@
             font-size: 1.2rem;
             font-weight: bold;
         }
+
+        .finalWallPreview {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            align-items: center;
+            margin: 10px 0;
+
+            .row {
+                gap: 4px;
+            }
+
+            .cell {
+                width: 25px;
+                height: 25px;
+            }
+        }
     }
 }
 
@@ -327,7 +357,6 @@
     }
 }
 
-// À ajouter en haut ou dans vos media queries
 $tile-size-mobile: 30px;
 $tile-size-tablet: 35px;
 
@@ -337,7 +366,7 @@ $tile-size-tablet: 35px;
     }
 
     .playersContainer {
-        grid-template-columns: 1fr; // On empile les plateaux joueurs
+        grid-template-columns: 1fr;
         gap: 20px;
     }
 
@@ -361,16 +390,15 @@ $tile-size-tablet: 35px;
     }
 
     .boardGrid {
-        flex-direction: column; // Motif au dessus du Mur
+        flex-direction: column;
         align-items: center;
         gap: 15px;
     }
 
     .line {
-        justify-content: center; // Centrage sur mobile
+        justify-content: center;
     }
 
-    // Réduction de la taille des tuiles pour que ça tienne sur un écran de téléphone
     .slot,
     .cell,
     .floorSlot {
@@ -393,7 +421,6 @@ $tile-size-tablet: 35px;
     }
 }
 
-// Gestion des modales sur mobile
 @media (max-width: 480px) {
     .resultsContainer {
         flex-direction: column;
