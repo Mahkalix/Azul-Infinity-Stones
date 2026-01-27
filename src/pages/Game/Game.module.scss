@@ -240,8 +240,8 @@
     }
 
     &.filled {
-    border-color: rgba(255, 255, 255, 0.3);
-    background: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.3);
+        background: rgba(255, 255, 255, 0.1);
 
         .ghost {
             display: none;
@@ -389,10 +389,21 @@ $tile-size-tablet: 35px;
         }
     }
 
+    .wall {
+        transform: rotate(90deg);
+        transform-origin: center;
+        // Ajuste la marge car la rotation ne change pas l'espace occupé initialement
+        margin: 20px 0;
+    }
+
     .boardGrid {
         flex-direction: column;
         align-items: center;
         gap: 15px;
+    }
+
+    .patterns {
+        align-items: flex-start;
     }
 
     .line {
