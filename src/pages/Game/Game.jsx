@@ -16,10 +16,7 @@ const Game = () => {
 
     if (players.length === 0) return null;
 
-    const bagStats = bag.reduce((acc, s) => {
-        acc[s] = (acc[s] || 0) + 1;
-        return acc;
-    }, {});
+    const bagStats = (bag || []).reduce((acc, s) => { acc[s] = (acc[s] || 0) + 1; return acc; }, {});
 
     const WALL_ORDER = [
         [STONE_TYPES.SPACE, STONE_TYPES.MIND, STONE_TYPES.REALITY, STONE_TYPES.POWER, STONE_TYPES.TIME],
@@ -30,12 +27,26 @@ const Game = () => {
     ];
 
     if (gameState === "GAME_OVER") {
-        const winner = [...players].sort((a, b) => b.score - a.score)[0];
+        const sorted = [...players].sort((a, b) => b.score - a.score);
         return (
             <div className={styles.gameOverOverlay}>
-                <div className={styles.modal}>
-                    <h2>FIN DE LA QUÊTE</h2>
-                    <h3>Le Joueur {winner.id} a réuni les pierres !</h3>
+                <div className={styles.finalModal}>
+                    <h2>🏆 VICTOIRE DU JOUEUR {sorted[0].id} 🏆</h2>
+                    <div className={styles.resultsContainer}>
+                        {sorted.map(p => (
+                            <div key={p.id} className={styles.playerResultCard}>
+                                <h3>Joueur {p.id}</h3>
+                                <div className={styles.finalWallPreview}>
+                                    {p.wall.map((row, i) => (
+                                        <div key={i} className={styles.row}>
+                                            {row.map((cell, j) => <div key={j} className={`${styles.cell} ${cell ? styles.filled : ''}`}>{cell && <Stone stoneType={cell} size="small" />}</div>)}
+                                        </div>
+                                    ))}
+                                </div>
+                                <p>Score final : {p.score}</p>
+                            </div>
+                        ))}
+                    </div>
                     <button onClick={() => navigate('/')} className={styles.restartBtn}>Menu Principal</button>
                 </div>
             </div>
@@ -47,21 +58,15 @@ const Game = () => {
             <header className={styles.header}>
                 <h1>TOUR : JOUEUR {currentPlayerId}</h1>
                 <div className={styles.controls}>
-                    <button className={styles.bagBtn} onClick={() => setShowBag(true)}>
-                        👜 Voir le Sac ({bag.length})
-                    </button>
+                    <button className={styles.bagBtn} onClick={() => setShowBag(true)}>👜 Voir le Sac ({bag?.length || 0})</button>
                 </div>
-                {heldStones && (
-                    <div className={styles.hand}>
-                        En main : {heldStones.count}x <Stone stoneType={heldStones.type} size="small" />
-                    </div>
-                )}
+                {heldStones && <div className={styles.hand}>Main: {heldStones.count}x <Stone stoneType={heldStones.type} size="small" /></div>}
             </header>
 
             {showBag && (
                 <div className={styles.modalOverlay} onClick={() => setShowBag(false)}>
                     <div className={styles.bagModal} onClick={e => e.stopPropagation()}>
-                        <h2>Pierres restantes</h2>
+                        <h2>Contenu du Sac</h2>
                         <div className={styles.bagGrid}>
                             {Object.entries(bagStats).map(([type, count]) => (
                                 <div key={type} className={styles.bagItem}>
@@ -80,20 +85,12 @@ const Game = () => {
                     <div className={styles.factories}>
                         {factories.map((stones, i) => (
                             <div key={i} className={styles.factory}>
-                                {stones.map((s, j) => (
-                                    <div key={j} onClick={() => !heldStones && dispatch(pickFromFactory({ factoryIndex: i, stoneType: s }))}>
-                                        <Stone stoneType={s} size="medium" />
-                                    </div>
-                                ))}
+                                {stones.map((s, j) => <div key={j} onClick={() => !heldStones && dispatch(pickFromFactory({ factoryIndex: i, stoneType: s }))}><Stone stoneType={s} size="medium" /></div>)}
                             </div>
                         ))}
                     </div>
                     <div className={styles.center}>
-                        {center.map((s, i) => (
-                            <div key={i} onClick={() => !heldStones && dispatch(pickFromCenter({ stoneType: s }))}>
-                                <Stone stoneType={s} size="small" />
-                            </div>
-                        ))}
+                        {center.map((s, i) => <div key={i} onClick={() => !heldStones && dispatch(pickFromCenter({ stoneType: s }))}><Stone stoneType={s} size="small" /></div>)}
                     </div>
                 </section>
 
@@ -114,7 +111,9 @@ const Game = () => {
                                                  className={`${styles.line} ${isInvalid ? styles.invalid : ''}`}
                                                  onClick={() => heldStones && currentPlayerId === p.id && dispatch(placeStones({ lineIndex: i }))}
                                             >
-                                                {line.map((s, j) => <div key={j} className={styles.slot}>{s && <Stone stoneType={s} size="small" />}</div>)}
+                                                <div className={styles.lineSlots}>
+                                                    {line.map((s, j) => <div key={j} className={styles.slot}>{s && <Stone stoneType={s} size="small" />}</div>)}
+                                                </div>
                                             </div>
                                         );
                                     })}
@@ -122,11 +121,7 @@ const Game = () => {
                                 <div className={styles.wall}>
                                     {p.wall.map((row, i) => (
                                         <div key={i} className={styles.row}>
-                                            {row.map((cell, j) => (
-                                                <div key={j} className={`${styles.cell} ${cell ? styles.filled : ''}`}>
-                                                    {cell && <Stone stoneType={cell} size="small" />}
-                                                </div>
-                                            ))}
+                                            {row.map((cell, j) => <div key={j} className={`${styles.cell} ${cell ? styles.filled : ''}`}>{cell && <Stone stoneType={cell} size="small" />}</div>)}
                                         </div>
                                     ))}
                                 </div>

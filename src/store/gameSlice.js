@@ -82,23 +82,27 @@ const gameSlice = createSlice({
     placeStones: (state, action) => {
       const { lineIndex } = action.payload;
       const player = state.players.find(p => p.id === state.currentPlayerId);
+      if (!state.heldStones) return;
+
       const { type, count } = state.heldStones;
+      const line = player.patternLines[lineIndex];
       const colInWall = WALL_ORDER[lineIndex].indexOf(type);
+
+      const hasDifferentColor = line.some(s => s !== null && s !== type);
       const isAlreadyInWall = player.wall[lineIndex][colInWall] !== null;
-      const currentLine = player.patternLines[lineIndex];
-      const isDifferentColor = currentLine.some(s => s !== null && s !== type);
+
       let remaining = count;
 
-      if (isAlreadyInWall || isDifferentColor) {
+      if (hasDifferentColor || isAlreadyInWall) {
         while (remaining > 0 && player.floorLine.length < 7) {
           player.floorLine.push(type);
           remaining--;
         }
         if (remaining > 0) state.discard.push(...Array(remaining).fill(type));
       } else {
-        for (let i = 0; i < currentLine.length && remaining > 0; i++) {
-          if (currentLine[i] === null) {
-            currentLine[i] = type;
+        for (let i = line.length - 1; i >= 0 && remaining > 0; i--) {
+          if (line[i] === null) {
+            line[i] = type;
             remaining--;
           }
         }
@@ -149,7 +153,7 @@ const gameSlice = createSlice({
       } else {
         state.currentPlayerId = state.currentPlayerId === 1 ? 2 : 1;
       }
-    },
+    }
   },
 });
 
