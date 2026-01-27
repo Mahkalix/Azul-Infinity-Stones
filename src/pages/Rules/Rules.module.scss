@@ -1,0 +1,244 @@
+@use "../../styles/base/variables" as *;
+@use "../../styles/base/mixins" as *;
+
+.rules {
+  min-height: 100vh;
+  padding: $spacing-xl;
+  background: $bg-primary;
+  overflow-y: auto;
+  position: relative;
+}
+
+.backArrow {
+  position: fixed;
+  top: $spacing-lg;
+  left: $spacing-lg;
+  width: 48px;
+  height: 48px;
+  background: $bg-secondary;
+  border: 1px solid rgba($text-secondary, 0.2);
+  border-radius: 50%;
+  cursor: pointer;
+  @include flex-center;
+  transition: all 0.3s ease;
+  z-index: 100;
+
+  svg {
+    width: 24px;
+    height: 24px;
+    color: $text-primary;
+    transition: all 0.3s ease;
+  }
+
+  &:hover {
+    background: $color-primary;
+    border-color: $color-primary;
+
+    svg {
+      color: $bg-primary;
+      transform: translateX(-2px);
+    }
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  @include flex-column;
+  gap: $spacing-xl;
+  @include fade-in;
+}
+
+.header {
+  text-align: center;
+  @include flex-column;
+  gap: $spacing-md;
+  padding-bottom: $spacing-lg;
+  border-bottom: 1px solid rgba($text-secondary, 0.2);
+}
+
+.title {
+  font-size: clamp(36px, 6vw, 56px);
+  font-weight: 700;
+  letter-spacing: 6px;
+  color: $text-primary;
+  text-transform: uppercase;
+}
+
+.subtitle {
+  font-size: 18px;
+  color: $text-secondary;
+  line-height: 1.6;
+}
+
+.stonesLegend {
+  display: flex;
+  justify-content: center;
+  gap: $spacing-lg;
+  flex-wrap: wrap;
+  padding: $spacing-md 0;
+}
+
+.stoneLegendItem {
+  @include flex-column-center;
+  gap: $spacing-xs;
+}
+
+.stoneName {
+  font-size: 12px;
+  color: $text-secondary;
+  text-transform: capitalize;
+  letter-spacing: 1px;
+}
+
+.content {
+  @include flex-column;
+  gap: $spacing-xl;
+}
+
+.section {
+  @include flex-column;
+  gap: $spacing-md;
+  background: $bg-secondary;
+  padding: $spacing-lg;
+  border-radius: 12px;
+  border: 1px solid rgba($text-secondary, 0.1);
+
+  p {
+    color: $text-secondary;
+    line-height: 1.75;
+    font-size: 16px;
+  }
+}
+
+.sectionTitle {
+  font-size: 24px;
+  font-weight: 600;
+  color: $color-primary;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: $spacing-xs;
+}
+
+.phase {
+  background: rgba($bg-primary, 0.5);
+  padding: $spacing-md;
+  border-radius: 8px;
+  margin-top: $spacing-sm;
+  @include flex-column;
+  gap: $spacing-sm;
+
+  p {
+    margin-bottom: $spacing-xs;
+  }
+}
+
+.phaseTitle {
+  font-size: 18px;
+  font-weight: 600;
+  color: $text-primary;
+  letter-spacing: 1px;
+}
+
+.list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  @include flex-column;
+  gap: $spacing-sm;
+
+  li {
+    color: $text-secondary;
+    line-height: 1.6;
+    padding-left: $spacing-lg;
+    position: relative;
+
+    &::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 10px;
+      width: 8px;
+      height: 8px;
+      background: $color-primary;
+      border-radius: 50%;
+      @include glow($color-primary, 0.5, 4px);
+    }
+
+    strong {
+      color: $text-primary;
+      font-weight: 600;
+    }
+  }
+}
+
+.bonusBox {
+  background: linear-gradient(
+    135deg,
+    rgba($color-primary, 0.15),
+    rgba($color-power, 0.1)
+  );
+  border: 1px solid rgba($color-primary, 0.3);
+  border-radius: 8px;
+  padding: $spacing-md;
+  margin-top: $spacing-md;
+
+  h4 {
+    font-size: 16px;
+    font-weight: 600;
+    color: $color-primary;
+    margin-bottom: $spacing-sm;
+    letter-spacing: 1px;
+  }
+
+  .list li::before {
+    background: $color-time;
+    @include glow($color-time, 0.5, 4px);
+  }
+}
+
+.actions {
+  @include flex-column-center;
+  padding-top: $spacing-lg;
+  border-top: 1px solid rgba($text-secondary, 0.2);
+
+  button {
+    min-width: 250px;
+  }
+}
+
+@include respond-to("mobile") {
+  .rules {
+    padding: $spacing-md;
+  }
+
+  .container {
+    gap: $spacing-lg;
+  }
+
+  .section {
+    padding: $spacing-md;
+  }
+
+  .sectionTitle {
+    font-size: 20px;
+  }
+
+  .stonesLegend {
+    gap: $spacing-md;
+  }
+
+  .phase {
+    padding: $spacing-sm;
+  }
+}
+
+@include respond-to("tablet") {
+  .rules {
+    padding: $spacing-lg;
+  }
+}
