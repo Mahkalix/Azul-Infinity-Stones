@@ -1,229 +1,101 @@
-@use "../../styles/base/variables" as *; // INDISPENSABLE pour utiliser $radius-sm, $color-primary, etc.
-@use "../../styles/base/mixins" as *;
+@use "../../styles/base/variables" as *;
 
 .gameContainer {
+    background: $bg-primary;
     min-height: 100vh;
-    padding: $spacing-xl;
-    background: radial-gradient(circle at center, $bg-secondary 0%, $bg-primary 100%);
+    color: white;
+    padding: 20px;
+}
+
+.mainContent {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    color: $text-primary;
+    gap: 40px;
 }
 
-.gameHeader {
-    text-align: center;
-    margin-bottom: $spacing-xxl;
-
-    h1 {
-        color: $color-primary;
-        letter-spacing: 4px;
-        text-shadow: 0 0 15px rgba($color-primary, 0.5);
-    }
-}
-
-.handStatus {
-    margin-top: $spacing-md;
-    height: 60px;
+.factories {
     display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
     justify-content: center;
-    align-items: center;
-}
-
-.holding {
-    display: flex;
-    align-items: center;
-    gap: $spacing-md;
-    background: rgba($color-primary, 0.1);
-    padding: $spacing-sm $spacing-lg;
-    border: 1px solid $color-primary;
-    border-radius: $radius-md;
-    animation: pulse 2s infinite;
-}
-
-.gameLayout {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: $spacing-xxl;
-    width: 100%;
-    max-width: 1200px;
-}
-
-// Zone des Fabriques
-.factoriesGrid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: $spacing-lg;
-    margin-bottom: $spacing-xl;
 }
 
 .factory {
-    width: 140px;
-    height: 140px;
-    border-radius: 50%;
+    width: 120px;
+    height: 120px;
     border: 2px solid $color-primary;
-    background: rgba(0, 0, 0, 0.4);
+    border-radius: 50%;
     display: flex;
     flex-wrap: wrap;
-    padding: $spacing-md;
-    justify-content: center;
+    padding: 10px;
     align-items: center;
-    transition: transform 0.3s ease;
-
-    &:hover {
-        transform: scale(1.05);
-        box-shadow: 0 0 20px rgba($color-primary, 0.3);
-    }
-}
-
-.stoneInteract {
+    justify-content: center;
     cursor: pointer;
-    transition: transform 0.2s;
-    &:hover {
-        transform: scale(1.2);
-    }
 }
 
-// Plateau Joueur
-.patternLines {
+.center {
+    min-height: 80px;
+    border: 1px dashed white;
+    margin-top: 20px;
     display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: $spacing-sm;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 10px;
 }
 
-.patternLine {
-    display: flex;
-    gap: $spacing-xs;
-    padding: 4px;
-    border-radius: $radius-sm; // La variable est maintenant définie grâce au @use
-    transition: all 0.2s;
-
-    &.active {
-        cursor: pointer;
-        background: rgba($color-primary, 0.05);
-        &:hover {
-            background: rgba($color-primary, 0.15);
-        }
-    }
-}
-
-.slots {
-    display: flex;
-    gap: $spacing-xs;
-}
-
-.slot {
-    width: 40px;
-    height: 40px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: $radius-sm;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.centerArea {
-    background: rgba($bg-secondary, 0.5);
-    border-radius: $radius-lg;
-    padding: $spacing-md;
-    min-height: 100px;
-    border: 1px dashed rgba($color-primary, 0.3);
-
-    .centerStones {
-        display: flex;
-        flex-wrap: wrap;
-        gap: $spacing-sm;
-        justify-content: center;
-    }
-}
-
-@keyframes pulse {
-    0% {
-        box-shadow: 0 0 0 0 rgba($color-primary, 0.4);
-    }
-    70% {
-        box-shadow: 0 0 0 10px rgba($color-primary, 0);
-    }
-    100% {
-        box-shadow: 0 0 0 0 rgba($color-primary, 0);
-    }
-}
-
-.mainLayout {
-    display: flex;
-    flex-direction: column;
-    gap: $spacing-xxl;
-    width: 100%;
-}
-
-.playersContainer {
+.players {
     display: grid;
-    grid-template-columns: 1fr 1fr; // Deux colonnes égales
-    gap: $spacing-xl;
-    padding: $spacing-md;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
 }
 
 .playerBoard {
-    background: rgba($bg-secondary, 0.6);
-    border: 2px solid transparent;
-    border-radius: $radius-lg;
-    padding: $spacing-md;
-    transition: all 0.3s ease;
-    position: relative;
-
-    &.activeTurn {
-        border-color: $color-primary; // Bordure dorée pour le joueur actif
-        background: rgba($color-primary, 0.05);
-        box-shadow: 0 0 20px rgba($color-primary, 0.2);
+    padding: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    &.active {
+        border-color: $color-primary;
+        box-shadow: 0 0 10px $color-primary;
     }
 }
 
-.boardLayout {
+.boardGrid {
     display: flex;
+    gap: 20px;
     justify-content: space-between;
-    gap: $spacing-md;
 }
 
-.patternLine {
+.line {
     display: flex;
-    justify-content: flex-end;
-    gap: 4px;
-    margin-bottom: 8px;
-    min-height: 40px;
-
-    &.clickable:hover {
-        background: rgba($color-primary, 0.1);
-        cursor: pointer;
-    }
+    flex-direction: row-reverse;
+    gap: 5px;
+    margin-bottom: 5px;
+    cursor: pointer;
 }
 
-.wallGrid {
-    display: grid;
-    grid-template-rows: repeat(5, 1fr);
-    gap: 4px;
-}
-
-.wallRow {
-    display: flex;
-    gap: 4px;
-}
-
-.wallCell {
+.slot,
+.cell,
+.floorSlot {
     width: 35px;
     height: 35px;
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.scoreBadge {
-    position: absolute;
-    top: $spacing-sm;
-    right: $spacing-sm;
-    background: $color-primary;
-    color: $bg-primary;
-    padding: 2px 8px;
-    border-radius: $radius-sm;
-    font-weight: bold;
+.row {
+    display: flex;
+    gap: 5px;
+    margin-bottom: 5px;
+}
+
+.floor {
+    display: flex;
+    gap: 5px;
+    margin-top: 20px;
+    .floorSlot {
+        font-size: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: $color-danger;
+    }
 }

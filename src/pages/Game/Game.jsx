@@ -6,118 +6,76 @@ import styles from './Game.module.scss';
 
 const Game = () => {
     const dispatch = useDispatch();
-    const game = useSelector((state) => state.game || {});
-    const {
-        factories = [],
-        center = [],
-        heldStones = null,
-        players = [],
-        currentPlayerId = 1
-    } = game;
+    const { factories, center, players, currentPlayerId, heldStones } = useSelector(state => state.game);
 
-    useEffect(() => {
-        if (players.length === 0) {
-            dispatch(initGame());
-        }
-    }, [dispatch, players.length]);
+    useEffect(() => { if (players.length === 0) dispatch(initGame()); }, [dispatch, players]);
 
-    if (players.length === 0) return <div className={styles.loading}>Chargement...</div>;
+    if (players.length === 0) return <div className={styles.loading}>Chargement du Gant...</div>;
 
     return (
         <div className={styles.gameContainer}>
-            <header className={styles.gameHeader}>
-                <h1>AZUL: INFINITY STONES</h1>
-
-                <div className={styles.statusZone}>
-                    {heldStones ? (
-                        <div className={styles.holdingIndicator}>
-                            <span>Main de Thanos : {heldStones.count}x</span>
-                            <Stone stoneType={heldStones.type} size="small" />
-                            <small>Placez-les sur votre plateau</small>
-                        </div>
-                    ) : (
-                        <div className={styles.turnInfo}>
-                            C'est au tour du <strong>Joueur {currentPlayerId}</strong>
-                        </div>
-                    )}
-                </div>
+            <header className={styles.header}>
+                <h1>Tour : Joueur {currentPlayerId}</h1>
+                {heldStones && (
+                    <div className={styles.hand}>
+                        En main : {heldStones.count}x <Stone stoneType={heldStones.type} size="small" />
+                    </div>
+                )}
             </header>
 
-            <main className={styles.mainLayout}>
-                {/* ZONE COMMUNE (HAUT) */}
-                <section className={styles.commonArea}>
-                    <div className={styles.factoriesGrid}>
-                        {factories.map((stones, fIdx) => (
-                            <div key={fIdx} className={styles.factory}>
-                                {stones.map((stone, sIdx) => (
-                                    <div key={sIdx} onClick={() => !heldStones && dispatch(pickFromFactory({ factoryIndex: fIdx, stoneType: stone }))}>
-                                        <Stone stoneType={stone} size="medium" className={styles.interactiveStone} />
+            <div className={styles.mainContent}>
+                <section className={styles.supply}>
+                    <div className={styles.factories}>
+                        {factories.map((stones, i) => (
+                            <div key={i} className={styles.factory}>
+                                {stones.map((s, j) => (
+                                    <div key={j} onClick={() => !heldStones && dispatch(pickFromFactory({ factoryIndex: i, stoneType: s }))}>
+                                        <Stone stoneType={s} size="medium" />
                                     </div>
                                 ))}
                             </div>
                         ))}
                     </div>
-
-                    <div className={styles.centerTable}>
-                        <h3>Centre de la Galaxie</h3>
-                        <div className={styles.centerStones}>
-                            {center.map((stone, idx) => (
-                                <div key={idx} onClick={() => !heldStones && dispatch(pickFromCenter({ stoneType: stone }))}>
-                                    <Stone stoneType={stone} size="small" className={styles.interactiveStone} />
-                                </div>
-                            ))}
-                        </div>
+                    <div className={styles.center} onClick={() => console.log("Clic centre")}>
+                        {center.map((s, i) => (
+                            <div key={i} onClick={(e) => { e.stopPropagation(); if (!heldStones) dispatch(pickFromCenter({ stoneType: s })); }}>
+                                <Stone stoneType={s} size="small" />
+                            </div>
+                        ))}
                     </div>
                 </section>
 
-                {/* ZONE DES JOUEURS (BAS - CÔTE À CÔTE) */}
-                <section className={styles.playersContainer}>
-                    {players.map((player) => (
-                        <div
-                            key={player.id}
-                            className={`${styles.playerBoard} ${currentPlayerId === player.id ? styles.activeTurn : ''}`}
-                        >
-                            <h2 className={styles.playerTitle}>
-                                JOUEUR {player.id} {currentPlayerId === player.id ? "⚡" : ""}
-                            </h2>
-
-                            <div className={styles.boardLayout}>
-                                {/* Lignes de Motif */}
-                                <div className={styles.patternSection}>
-                                    {player.patternLines.map((line, lineIdx) => (
-                                        <div
-                                            key={lineIdx}
-                                            className={`${styles.patternLine} ${heldStones && currentPlayerId === player.id ? styles.clickable : ''}`}
-                                            onClick={() => heldStones && currentPlayerId === player.id && dispatch(placeStones({ lineIndex: lineIdx }))}
-                                        >
-                                            {line.map((slot, sIdx) => (
-                                                <div key={sIdx} className={styles.slot}>
-                                                    {slot && <Stone stoneType={slot} size="small" />}
-                                                </div>
-                                            ))}
+                <section className={styles.players}>
+                    {players.map(p => (
+                        <div key={p.id} className={`${styles.playerBoard} ${currentPlayerId === p.id ? styles.active : ''}`}>
+                            <h3>Joueur {p.id} - Score: {p.score}</h3>
+                            <div className={styles.boardGrid}>
+                                <div className={styles.patterns}>
+                                    {p.patternLines.map((line, i) => (
+                                        <div key={i} className={styles.line} onClick={() => heldStones && currentPlayerId === p.id && dispatch(placeStones({ lineIndex: i }))}>
+                                            {line.map((s, j) => <div key={j} className={styles.slot}>{s && <Stone stoneType={s} size="small" />}</div>)}
                                         </div>
                                     ))}
                                 </div>
-
-                                {/* Mur / Gant */}
-                                <div className={styles.wallGrid}>
-                                    {player.wall.map((row, rIdx) => (
-                                        <div key={rIdx} className={styles.wallRow}>
-                                            {row.map((cell, cIdx) => (
-                                                <div key={cIdx} className={`${styles.wallCell} ${cell ? styles.filled : ''}`}>
-                                                    {cell && <Stone stoneType={cell} size="small" />}
-                                                </div>
-                                            ))}
+                                <div className={styles.wall}>
+                                    {p.wall.map((row, i) => (
+                                        <div key={i} className={styles.row}>
+                                            {row.map((cell, j) => <div key={j} className={`${styles.cell} ${cell ? styles.filled : ''}`}>{cell && <Stone stoneType={cell} size="small" />}</div>)}
                                         </div>
                                     ))}
                                 </div>
                             </div>
-
-                            <div className={styles.scoreBadge}>Score: {player.score}</div>
+                            <div className={styles.floor}>
+                                {Array(7).fill(null).map((_, i) => (
+                                    <div key={i} className={styles.floorSlot}>
+                                        {p.floorLine[i] === "FIRST_PLAYER" ? "1st" : p.floorLine[i] && <Stone stoneType={p.floorLine[i]} size="small" />}
+                                    </div>
+                                ))}
+                            </div>
                         </div>
                     ))}
                 </section>
-            </main>
+            </div>
         </div>
     );
 };

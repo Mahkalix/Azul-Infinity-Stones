@@ -1,6 +1,45 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { STONE_TYPES, FACTORY_COUNT } from "../constants";
 
+// Ordre des pierres sur le mur pour respecter la règle Azul (décalage à chaque ligne)
+const WALL_ORDER = [
+  [
+    STONE_TYPES.SPACE,
+    STONE_TYPES.MIND,
+    STONE_TYPES.REALITY,
+    STONE_TYPES.POWER,
+    STONE_TYPES.TIME,
+  ],
+  [
+    STONE_TYPES.TIME,
+    STONE_TYPES.SPACE,
+    STONE_TYPES.MIND,
+    STONE_TYPES.REALITY,
+    STONE_TYPES.POWER,
+  ],
+  [
+    STONE_TYPES.POWER,
+    STONE_TYPES.TIME,
+    STONE_TYPES.SPACE,
+    STONE_TYPES.MIND,
+    STONE_TYPES.REALITY,
+  ],
+  [
+    STONE_TYPES.REALITY,
+    STONE_TYPES.POWER,
+    STONE_TYPES.TIME,
+    STONE_TYPES.SPACE,
+    STONE_TYPES.MIND,
+  ],
+  [
+    STONE_TYPES.MIND,
+    STONE_TYPES.REALITY,
+    STONE_TYPES.POWER,
+    STONE_TYPES.TIME,
+    STONE_TYPES.SPACE,
+  ],
+];
+
 const createEmptyPlayer = (id) => ({
   id,
   patternLines: Array(5)
@@ -13,23 +52,36 @@ const createEmptyPlayer = (id) => ({
   score: 0,
 });
 
-const initialState = {
-  factories: [],
-  center: [],
-  players: [],
-  currentPlayerId: 1,
-  heldStones: null,
-  gameState: "LOBBY",
+const calculatePoints = (wall, row, col) => {
+  let hScore = 0;
+  let vScore = 0;
+  // Horizontal
+  for (let i = col + 1; i < 5 && wall[row][i]; i++) hScore++;
+  for (let i = col - 1; i >= 0 && wall[row][i]; i--) hScore++;
+  // Vertical
+  for (let i = row + 1; i < 5 && wall[i][col]; i++) vScore++;
+  for (let i = row - 1; i >= 0 && wall[i][col]; i--) vScore++;
+
+  let total = 1;
+  if (hScore > 0) total += hScore;
+  if (vScore > 0) total += vScore;
+  return total;
 };
 
 const gameSlice = createSlice({
   name: "game",
-  initialState,
+  initialState: {
+    factories: [],
+    center: [],
+    players: [],
+    currentPlayerId: 1,
+    heldStones: null,
+    firstStonePicked: false,
+    gameState: "LOBBY",
+  },
   reducers: {
     initGame: (state) => {
-      const playerCount = 2;
-      const numFactories = FACTORY_COUNT[playerCount];
-
+      const numFactories = FACTORY_COUNT[2];
       state.factories = Array(numFactories)
         .fill([])
         .map(() =>
@@ -40,21 +92,20 @@ const gameSlice = createSlice({
               return types[Math.floor(Math.random() * types.length)];
             }),
         );
-
       state.players = [createEmptyPlayer(1), createEmptyPlayer(2)];
       state.center = [];
-      state.currentPlayerId = 1;
-      state.heldStones = null;
+      state.firstStonePicked = false;
       state.gameState = "PLAYING";
     },
 
     pickFromFactory: (state, action) => {
       const { factoryIndex, stoneType } = action.payload;
-      const factory = state.factories[factoryIndex];
-
-      const picked = factory.filter((s) => s === stoneType);
-      const remaining = factory.filter((s) => s !== stoneType);
-
+      const picked = state.factories[factoryIndex].filter(
+        (s) => s === stoneType,
+      );
+      const remaining = state.factories[factoryIndex].filter(
+        (s) => s !== stoneType,
+      );
       state.center.push(...remaining);
       state.factories[factoryIndex] = [];
       state.heldStones = { type: stoneType, count: picked.length };
@@ -62,63 +113,79 @@ const gameSlice = createSlice({
 
     pickFromCenter: (state, action) => {
       const { stoneType } = action.payload;
+      const player = state.players.find((p) => p.id === state.currentPlayerId);
+      if (!state.firstStonePicked) {
+        player.floorLine.push("FIRST_PLAYER");
+        state.firstStonePicked = true;
+      }
       const picked = state.center.filter((s) => s === stoneType);
-      const remaining = state.center.filter((s) => s !== stoneType);
-
-      state.center = remaining;
+      state.center = state.center.filter((s) => s !== stoneType);
       state.heldStones = { type: stoneType, count: picked.length };
     },
 
     placeStones: (state, action) => {
       const { lineIndex } = action.payload;
-      if (!state.heldStones) return;
-
       const player = state.players.find((p) => p.id === state.currentPlayerId);
       const { type, count } = state.heldStones;
       const line = player.patternLines[lineIndex];
 
-      const isLineEmpty = line.every((slot) => slot === null);
-      const isSameType = line.find((slot) => slot !== null) === type;
-      const rowInWall = player.wall[lineIndex];
-      const alreadyInWall = rowInWall.includes(type);
+      const colInWall = WALL_ORDER[lineIndex].indexOf(type);
+      if (player.wall[lineIndex][colInWall]) return; // Déjà sur le mur
 
-      if ((isLineEmpty || isSameType) && !alreadyInWall) {
-        let remaining = count;
-
-        for (let i = 0; i < line.length; i++) {
-          if (line[i] === null && remaining > 0) {
-            line[i] = type;
-            remaining--;
-          }
+      let remaining = count;
+      for (let i = 0; i < line.length && remaining > 0; i++) {
+        if (line[i] === null) {
+          line[i] = type;
+          remaining--;
         }
+      }
+      while (remaining > 0 && player.floorLine.length < 7) {
+        player.floorLine.push(type);
+        remaining--;
+      }
 
-        if (remaining > 0) {
-          for (let i = 0; i < remaining; i++) {
-            if (player.floorLine.length < 7) {
-              player.floorLine.push(type);
+      state.heldStones = null;
+
+      const isEndTurn =
+        state.factories.every((f) => f.length === 0) &&
+        state.center.length === 0;
+      if (isEndTurn) {
+        // Scoring phase
+        state.players.forEach((p) => {
+          p.patternLines.forEach((line, row) => {
+            if (line.every((s) => s !== null)) {
+              const stone = line[0];
+              const col = WALL_ORDER[row].indexOf(stone);
+              p.wall[row][col] = stone;
+              p.score += calculatePoints(p.wall, row, col);
+              p.patternLines[row] = Array(row + 1).fill(null);
             }
-          }
-        }
-
-        state.heldStones = null;
+          });
+          const penalties = [-1, -1, -2, -2, -2, -3, -3];
+          p.floorLine.forEach(
+            (_, i) => (p.score = Math.max(0, p.score + penalties[i])),
+          );
+          p.floorLine = [];
+        });
+        // Reset factories for next round
+        const numFactories = FACTORY_COUNT[2];
+        state.factories = Array(numFactories)
+          .fill([])
+          .map(() =>
+            Array(4)
+              .fill(null)
+              .map(
+                () => Object.values(STONE_TYPES)[Math.floor(Math.random() * 5)],
+              ),
+          );
+        state.firstStonePicked = false;
+      } else {
         state.currentPlayerId = state.currentPlayerId === 1 ? 2 : 1;
       }
-    },
-
-    nextTurn: (state) => {
-      state.currentPlayerId = state.currentPlayerId === 1 ? 2 : 1;
-      state.heldStones = null;
     },
   },
 });
 
-// CORRECTION ICI : Ajout de placeStones et pickFromCenter dans les exports
-export const {
-  initGame,
-  pickFromFactory,
-  pickFromCenter,
-  placeStones,
-  nextTurn,
-} = gameSlice.actions;
-
+export const { initGame, pickFromFactory, pickFromCenter, placeStones } =
+  gameSlice.actions;
 export default gameSlice.reducer;
