@@ -30,7 +30,9 @@
   &:not(:disabled):active {
     transform: skewX(-10deg) translateY(2px);
   }
-} // Sizes
+}
+
+// Sizes
 .small {
   padding: 6px 16px;
   font-size: 13px;
@@ -80,18 +82,23 @@
   background: transparent;
   border: 2px solid rgba($color-primary, 0.4);
   color: $color-primary;
-  box-shadow: 0 4px 0 rgba($color-primary, 0.2), 0 4px 10px rgba(0, 0, 0, 0.2);
+  box-shadow:
+    0 4px 0 rgba($color-primary, 0.2),
+    0 4px 10px rgba(0, 0, 0, 0.2);
 
   &:not(:disabled):hover {
     background: rgba($color-primary, 0.1);
     border-color: $color-primary;
-    box-shadow: 0 6px 0 rgba($color-primary, 0.3),
+    box-shadow:
+      0 6px 0 rgba($color-primary, 0.3),
       0 6px 15px rgba($color-primary, 0.3);
     transform: skewX(-10deg) translateY(-2px);
   }
 
   &:not(:disabled):active {
-    box-shadow: 0 1px 0 rgba($color-primary, 0.2), 0 1px 5px rgba(0, 0, 0, 0.2);
+    box-shadow:
+      0 1px 0 rgba($color-primary, 0.2),
+      0 1px 5px rgba(0, 0, 0, 0.2);
     transform: skewX(-10deg) translateY(2px);
   }
 }
