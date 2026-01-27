@@ -1,4 +1,4 @@
-@use "sass:color"; // Ajouté pour corriger les avertissements de dépréciation
+@use "sass:color";
 @use "../../styles/base/variables" as *;
 @use "../../styles/base/mixins" as *;
 
@@ -58,7 +58,6 @@
   }
 
   &:not(:disabled):active {
-    // Remplacement de darken($color-primary-dark, 5%)
     background: color.adjust($color-primary-dark, $lightness: -5%);
   }
 }
@@ -74,7 +73,6 @@
   }
 
   &:not(:disabled):active {
-    // Remplacement de darken($color-primary-dark, 5%)
     border-color: color.adjust($color-primary-dark, $lightness: -5%);
     color: color.adjust($color-primary-dark, $lightness: -5%);
   }

@@ -1,7 +1,7 @@
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home/Home";
-import Game from "./pages/Game/Game"; // Importez la nouvelle page
+import Game from "./pages/Game/Game";
 
 function App() {
   return (
