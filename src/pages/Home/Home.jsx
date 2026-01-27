@@ -4,8 +4,8 @@ import { Button } from "../../components/Button";
 import { Stone } from "../../components/Stones";
 import { STONE_TYPES } from "../../constants";
 import styles from "./Home.module.scss";
-import { useDispatch } from "react-redux"; // Ajouté
-import { initGame } from "../../store/gameSlice"; // Ajouté
+import { useDispatch } from "react-redux";
+import { initGame } from "../../store/gameSlice";
 
 const Home = () => {
   const navigate = useNavigate();

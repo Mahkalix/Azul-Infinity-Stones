@@ -2,7 +2,7 @@
 
 .playerBoard {
     display: grid;
-    grid-template-columns: 1fr 1fr; // Gauche: Lignes de motif, Droite: Mur
+    grid-template-columns: 1fr 1fr;
     gap: $spacing-xl;
     background: rgba($bg-secondary, 0.9);
     padding: $spacing-lg;
@@ -21,6 +21,6 @@
     // Style spécifique quand une pierre est placée
     &.filled {
         border-style: solid;
-        box-shadow: 0 0 10px currentColor; // Utilise la couleur de la pierre
+        box-shadow: 0 0 10px currentColor;
     }
 }
