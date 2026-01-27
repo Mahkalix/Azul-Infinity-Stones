@@ -18,8 +18,7 @@ const createEmptyPlayer = (id) => ({
 });
 
 const calculatePoints = (wall, row, col) => {
-  let hScore = 0;
-  let vScore = 0;
+  let hScore = 0, vScore = 0;
   for (let i = col + 1; i < 5 && wall[row][i]; i++) hScore++;
   for (let i = col - 1; i >= 0 && wall[row][i]; i--) hScore++;
   for (let i = row + 1; i < 5 && wall[i][col]; i++) vScore++;
@@ -37,50 +36,57 @@ const gameSlice = createSlice({
     center: [],
     players: [],
     currentPlayerId: 1,
+    nextFirstPlayerId: 1,
     heldStones: null,
     firstStonePicked: false,
     gameState: "LOBBY",
+    bag: [],
+    discard: []
   },
   reducers: {
     initGame: (state) => {
-      const numFactories = FACTORY_COUNT[2];
-      state.factories = Array(numFactories).fill([]).map(() =>
-          Array(4).fill(null).map(() => Object.values(STONE_TYPES)[Math.floor(Math.random() * 5)])
-        );
+      let initialBag = [];
+      Object.values(STONE_TYPES).forEach(type => {
+        for(let i=0; i<20; i++) initialBag.push(type);
+      });
+      state.bag = initialBag.sort(() => Math.random() - 0.5);
       state.players = [createEmptyPlayer(1), createEmptyPlayer(2)];
+      const numFactories = FACTORY_COUNT[2];
+      state.factories = Array(numFactories).fill([]).map(() => state.bag.splice(0, 4));
       state.center = [];
+      state.discard = [];
       state.firstStonePicked = false;
       state.gameState = "PLAYING";
+      state.currentPlayerId = 1;
+      state.nextFirstPlayerId = 1;
     },
     pickFromFactory: (state, action) => {
       const { factoryIndex, stoneType } = action.payload;
-      const picked = state.factories[factoryIndex].filter((s) => s === stoneType);
-      state.center.push(...state.factories[factoryIndex].filter((s) => s !== stoneType));
+      const picked = state.factories[factoryIndex].filter(s => s === stoneType);
+      state.center.push(...state.factories[factoryIndex].filter(s => s !== stoneType));
       state.factories[factoryIndex] = [];
       state.heldStones = { type: stoneType, count: picked.length };
     },
     pickFromCenter: (state, action) => {
       const { stoneType } = action.payload;
-      const player = state.players.find((p) => p.id === state.currentPlayerId);
+      const player = state.players.find(p => p.id === state.currentPlayerId);
       if (!state.firstStonePicked) {
         if (player.floorLine.length < 7) player.floorLine.push("FIRST_PLAYER");
         state.firstStonePicked = true;
+        state.nextFirstPlayerId = state.currentPlayerId;
       }
-      const picked = state.center.filter((s) => s === stoneType);
-      state.center = state.center.filter((s) => s !== stoneType);
+      const picked = state.center.filter(s => s === stoneType);
+      state.center = state.center.filter(s => s !== stoneType);
       state.heldStones = { type: stoneType, count: picked.length };
     },
     placeStones: (state, action) => {
       const { lineIndex } = action.payload;
-      const player = state.players.find((p) => p.id === state.currentPlayerId);
+      const player = state.players.find(p => p.id === state.currentPlayerId);
       const { type, count } = state.heldStones;
-
-      const rowInWall = player.wall[lineIndex];
       const colInWall = WALL_ORDER[lineIndex].indexOf(type);
-      const isAlreadyInWall = rowInWall[colInWall] !== null;
+      const isAlreadyInWall = player.wall[lineIndex][colInWall] !== null;
       const currentLine = player.patternLines[lineIndex];
       const isDifferentColor = currentLine.some(s => s !== null && s !== type);
-
       let remaining = count;
 
       if (isAlreadyInWall || isDifferentColor) {
@@ -88,58 +94,57 @@ const gameSlice = createSlice({
           player.floorLine.push(type);
           remaining--;
         }
+        if (remaining > 0) state.discard.push(...Array(remaining).fill(type));
       } else {
         for (let i = 0; i < currentLine.length && remaining > 0; i++) {
           if (currentLine[i] === null) {
             currentLine[i] = type;
+            remaining--;
+          }
+        }
+        while (remaining > 0 && player.floorLine.length < 7) {
+          player.floorLine.push(type);
           remaining--;
         }
+        if (remaining > 0) state.discard.push(...Array(remaining).fill(type));
       }
-      while (remaining > 0 && player.floorLine.length < 7) {
-        player.floorLine.push(type);
-        remaining--;
-      }
-      }
-
       state.heldStones = null;
 
-      if (state.factories.every((f) => f.length === 0) && state.center.length === 0) {
-        state.players.forEach((p) => {
+      if (state.factories.every(f => f.length === 0) && state.center.length === 0) {
+        state.players.forEach(p => {
           p.patternLines.forEach((l, row) => {
-            if (l.every((s) => s !== null)) {
+            if (l.every(s => s !== null)) {
               const stone = l[0];
               const col = WALL_ORDER[row].indexOf(stone);
               p.wall[row][col] = stone;
               p.score += calculatePoints(p.wall, row, col);
+              state.discard.push(...l.slice(1));
               p.patternLines[row] = Array(row + 1).fill(null);
             }
           });
-          const floorPenalties = [-1, -1, -2, -2, -2, -3, -3];
-          p.floorLine.forEach((_, i) => {
-            p.score = Math.max(0, p.score + floorPenalties[i]);
+          const penalties = [-1, -1, -2, -2, -2, -3, -3];
+          p.floorLine.forEach((item, i) => {
+            p.score = Math.max(0, p.score + (penalties[i] || -3));
+            if (item !== "FIRST_PLAYER") state.discard.push(item);
           });
           p.floorLine = [];
         });
 
-        if (state.players.some((p) => p.wall.some((row) => row.every((c) => c !== null)))) {
-          state.players.forEach((p) => {
-            p.wall.forEach((row) => {
-              if (row.every((c) => c !== null)) p.score += 2;
-            });
-            for (let c = 0; c < 5; c++) {
-              if (p.wall.every((r) => r[c] !== null)) p.score += 7;
-            }
-            Object.values(STONE_TYPES).forEach((t) => {
-              if (p.wall.every((row) => row.includes(t))) p.score += 10;
-            });
+        if (state.players.some(p => p.wall.some(row => row.every(c => c !== null)))) {
+          state.players.forEach(p => {
+            p.wall.forEach(row => { if (row.every(c => c !== null)) p.score += 2; });
+            for (let c = 0; c < 5; c++) { if (p.wall.every(r => r[c] !== null)) p.score += 7; }
+            Object.values(STONE_TYPES).forEach(t => { if (p.wall.every(row => row.includes(t))) p.score += 10; });
           });
           state.gameState = "GAME_OVER";
         } else {
-          state.factories = Array(FACTORY_COUNT[2]).fill([]).map(() =>
-              Array(4).fill(null).map(() => Object.values(STONE_TYPES)[Math.floor(Math.random() * 5)])
-            );
+          if (state.bag.length < FACTORY_COUNT[2] * 4) {
+            state.bag = [...state.bag, ...state.discard].sort(() => Math.random() - 0.5);
+            state.discard = [];
+          }
+          state.factories = Array(FACTORY_COUNT[2]).fill([]).map(() => state.bag.splice(0, 4));
           state.firstStonePicked = false;
-          state.currentPlayerId = 1;
+          state.currentPlayerId = state.nextFirstPlayerId;
         }
       } else {
         state.currentPlayerId = state.currentPlayerId === 1 ? 2 : 1;

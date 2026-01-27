@@ -10,6 +10,29 @@
     align-items: center;
 }
 
+.header {
+    width: 100%;
+    max-width: 1400px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    background: rgba($bg-secondary, 0.5);
+    border-radius: $radius-lg;
+    margin-bottom: 2rem;
+
+    .bagBtn {
+        background: $color-primary;
+        color: $bg-primary;
+        border: none;
+        padding: 8px 16px;
+        border-radius: $radius-md;
+        font-weight: bold;
+        cursor: pointer;
+        &:hover { background: $color-primary-light; }
+    }
+}
+
 .mainLayout {
     width: 100%;
     max-width: 1400px;
@@ -18,7 +41,46 @@
     gap: 40px;
 }
 
-// --- SECTION FABRIQUES ---
+// Modale du Sac
+.modalOverlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.bagModal {
+    background: $bg-secondary;
+    padding: 2rem;
+    border-radius: $radius-xl;
+    border: 2px solid $color-primary;
+    text-align: center;
+
+    .bagGrid {
+        display: flex;
+        gap: 20px;
+        margin: 20px 0;
+        .bagItem {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            span { font-weight: bold; font-size: 1.2rem; }
+        }
+    }
+    .closeBtn {
+        background: $color-primary;
+        border: none;
+        padding: 8px 20px;
+        border-radius: $radius-md;
+        cursor: pointer;
+    }
+}
+
+// Fabriques
 .factories {
     display: flex;
     flex-wrap: wrap;
@@ -33,14 +95,11 @@
     border-radius: 50%;
     border: 3px solid $color-primary;
     background: radial-gradient(circle, rgba($bg-secondary, 0.8) 0%, rgba(0, 0, 0, 0.6) 100%);
-    box-shadow: 0 0 15px rgba($color-primary, 0.3);
-
-    // Alignement des 4 pierres en carré au centre du cercle
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     grid-template-rows: repeat(2, 1fr);
     gap: 5px;
-    padding: 25px; // Ajustez le padding pour que les pierres ne touchent pas les bords
+    padding: 25px;
     align-items: center;
     justify-items: center;
 
@@ -50,7 +109,6 @@
     &:hover {
         transform: scale(1.05);
         box-shadow: 0 0 25px rgba($color-primary, 0.5);
-        border-color: $color-primary-light;
     }
 }
 
@@ -81,12 +139,7 @@
     border-radius: $radius-xl;
     background: rgba($bg-secondary, 0.7);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    transition: border-color 0.3s;
-
-    &.active {
-        border: 2px solid $color-primary;
-        box-shadow: 0 0 20px rgba($color-primary, 0.2);
-    }
+    &.active { border: 2px solid $color-primary; }
 }
 
 .boardGrid {
@@ -98,16 +151,22 @@
 // Lignes de motif (Pattern Lines)
 .line {
     display: flex;
-    flex-direction: row-reverse; // Pour remplir de droite à gauche
+    flex-direction: row-reverse;
     gap: 8px;
     margin-bottom: 12px;
     height: 45px;
     cursor: pointer;
+    border-radius: $radius-sm;
+    padding: 2px;
+
+    &.invalid {
+        background: rgba($color-danger, 0.1);
+        cursor: not-allowed;
+        opacity: 0.5;
+    }
 }
 
-.slot,
-.cell,
-.floorSlot {
+.slot, .cell, .floorSlot {
     width: 40px;
     height: 40px;
     background: rgba(255, 255, 255, 0.05);
@@ -133,25 +192,12 @@
 
     .floorSlot {
         position: relative;
-        border-color: rgba($color-danger, 0.3);
-
         .penalty {
             position: absolute;
             bottom: -18px;
             font-size: 11px;
             color: $color-danger;
-            font-weight: bold;
         }
+        .firstMarker { color: gold; font-weight: bold; font-size: 10px; }
     }
-}
-
-// Overlay de fin
-.gameOverOverlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.9);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 999;
 }
