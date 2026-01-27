@@ -5,6 +5,7 @@ import { Stone } from '../../components/Stones';
 import { initGame, pickFromFactory, pickFromCenter, placeStones } from '../../store/gameSlice';
 import { STONE_TYPES } from '../../constants';
 import styles from './Game.module.scss';
+import { Button } from '../../components/Button';
 
 const Game = () => {
     const dispatch = useDispatch();
@@ -47,7 +48,9 @@ const Game = () => {
                             </div>
                         ))}
                     </div>
-                    <button onClick={() => navigate('/')} className={styles.restartBtn}>Menu Principal</button>
+                    <Button variant="primary" size="large" onClick={() => navigate('/')}>
+                        Menu Principal
+                    </Button>
                 </div>
             </div>
         );
@@ -57,9 +60,12 @@ const Game = () => {
         <div className={styles.gameContainer}>
             <header className={styles.header}>
                 <h1>TOUR : JOUEUR {currentPlayerId}</h1>
-                <div className={styles.controls}>
-                    <button className={styles.bagBtn} onClick={() => setShowBag(true)}>👜 Voir le Sac ({bag?.length || 0})</button>
-                </div>
+                <Button
+                    size="small"
+                    onClick={() => setShowBag(true)}
+                >
+                    👜 Voir le Sac ({bag?.length || 0})
+                </Button>
                 {heldStones && <div className={styles.hand}>Main: {heldStones.count}x <Stone stoneType={heldStones.type} size="small" /></div>}
             </header>
 
@@ -75,7 +81,9 @@ const Game = () => {
                                 </div>
                             ))}
                         </div>
-                        <button className={styles.closeBtn} onClick={() => setShowBag(false)}>Fermer</button>
+                        <Button variant="secondary" size="small" onClick={() => setShowBag(false)} className={styles.closeBagBtn}>
+                            Fermer
+                        </Button>
                     </div>
                 </div>
             )}
@@ -108,8 +116,8 @@ const Game = () => {
                                         );
                                         return (
                                             <div key={i}
-                                                 className={`${styles.line} ${isInvalid ? styles.invalid : ''}`}
-                                                 onClick={() => heldStones && currentPlayerId === p.id && dispatch(placeStones({ lineIndex: i }))}
+                                                className={`${styles.line} ${isInvalid ? styles.invalid : ''}`}
+                                                onClick={() => heldStones && currentPlayerId === p.id && dispatch(placeStones({ lineIndex: i }))}
                                             >
                                                 <div className={styles.lineSlots}>
                                                     {line.map((s, j) => <div key={j} className={styles.slot}>{s && <Stone stoneType={s} size="small" />}</div>)}
