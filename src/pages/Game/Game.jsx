@@ -40,7 +40,11 @@ const Game = () => {
                                 <div className={styles.finalWallPreview}>
                                     {p.wall.map((row, i) => (
                                         <div key={i} className={styles.row}>
-                                            {row.map((cell, j) => <div key={j} className={`${styles.cell} ${cell ? styles.filled : ''}`}>{cell && <Stone stoneType={cell} size="small" />}</div>)}
+                                            {row.map((cell, j) => (
+                                                <div key={j} className={`${styles.cell} ${cell ? styles.filled : ''}`}>
+                                                    {cell ? <Stone stoneType={cell} size="small" /> : <div className={styles.ghost}><Stone stoneType={WALL_ORDER[i][j]} size="small" /></div>}
+                                                </div>
+                                            ))}
                                         </div>
                                     ))}
                                 </div>
@@ -60,10 +64,7 @@ const Game = () => {
         <div className={styles.gameContainer}>
             <header className={styles.header}>
                 <h1>TOUR : JOUEUR {currentPlayerId}</h1>
-                <Button
-                    size="small"
-                    onClick={() => setShowBag(true)}
-                >
+                <Button size="small" onClick={() => setShowBag(true)}>
                     👜 Voir le Sac ({bag?.length || 0})
                 </Button>
                 {heldStones && <div className={styles.hand}>Main: {heldStones.count}x <Stone stoneType={heldStones.type} size="small" /></div>}
@@ -116,8 +117,8 @@ const Game = () => {
                                         );
                                         return (
                                             <div key={i}
-                                                className={`${styles.line} ${isInvalid ? styles.invalid : ''}`}
-                                                onClick={() => heldStones && currentPlayerId === p.id && dispatch(placeStones({ lineIndex: i }))}
+                                                 className={`${styles.line} ${isInvalid ? styles.invalid : ''}`}
+                                                 onClick={() => heldStones && currentPlayerId === p.id && dispatch(placeStones({ lineIndex: i }))}
                                             >
                                                 <div className={styles.lineSlots}>
                                                     {line.map((s, j) => <div key={j} className={styles.slot}>{s && <Stone stoneType={s} size="small" />}</div>)}
@@ -129,7 +130,11 @@ const Game = () => {
                                 <div className={styles.wall}>
                                     {p.wall.map((row, i) => (
                                         <div key={i} className={styles.row}>
-                                            {row.map((cell, j) => <div key={j} className={`${styles.cell} ${cell ? styles.filled : ''}`}>{cell && <Stone stoneType={cell} size="small" />}</div>)}
+                                            {row.map((cell, j) => (
+                                                <div key={j} className={`${styles.cell} ${cell ? styles.filled : ''}`}>
+                                                    {cell ? <Stone stoneType={cell} size="small" /> : <div className={styles.ghost}><Stone stoneType={WALL_ORDER[i][j]} size="small" /></div>}
+                                                </div>
+                                            ))}
                                         </div>
                                     ))}
                                 </div>
