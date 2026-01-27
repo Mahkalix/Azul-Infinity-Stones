@@ -85,23 +85,51 @@
 .factory {
     width: 140px;
     height: 140px;
+    aspect-ratio: 1 / 1;
     border-radius: 50%;
+    overflow: hidden;
+
     border: 3px solid $color-primary;
     background: radial-gradient(circle, rgba($bg-secondary, 0.8) 0%, rgba(0, 0, 0, 0.6) 100%);
     box-shadow: 0 0 15px rgba($color-primary, 0.3);
+
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 5px;
+    grid-template-rows: repeat(2, 1fr);
+    gap: 8px;
     padding: 25px;
-    align-items: center;
-    justify-items: center;
+    place-items: center;
+
     cursor: pointer;
-    transition: 0.3s;
+    transition: all 0.3s ease;
+
+    & > * {
+        max-width: 40px;
+        max-height: 40px;
+        width: 100%;
+        height: auto;
+        object-fit: contain;
+    }
 
     &:hover {
         transform: scale(1.05);
-        border-color: $color-primary-light;
-        box-shadow: 0 0 25px rgba($color-primary, 0.5);
+    }
+
+    // --- ADAPTATION MOBILE ---
+    @media (max-width: 768px) {
+        width: 120px !important; // On réduit la fabrique pour que 15px paraissent bien
+        height: 120px !important;
+        padding: 10px !important; // On réduit le padding au strict minimum
+        gap: 2px !important; // On colle les pierres pour gagner de la place
+
+        img,
+        svg,
+        .gem,
+        div[class*="tile"] {
+            width: 20px !important; // TAILLE DEMANDÉE
+            height: 20px !important; // TAILLE DEMANDÉE
+            flex-shrink: 0 !important; // Empêche l'écrasement
+        }
     }
 }
 
@@ -296,5 +324,84 @@
 
     &:hover {
         background: $color-primary-light;
+    }
+}
+
+// À ajouter en haut ou dans vos media queries
+$tile-size-mobile: 30px;
+$tile-size-tablet: 35px;
+
+@media (max-width: 1024px) {
+    .mainLayout {
+        padding: 0 10px;
+    }
+
+    .playersContainer {
+        grid-template-columns: 1fr; // On empile les plateaux joueurs
+        gap: 20px;
+    }
+
+    .factory {
+        width: 110px;
+        height: 110px;
+        padding: 15px;
+    }
+}
+
+@media (max-width: 768px) {
+    .header {
+        flex-direction: column;
+        gap: 15px;
+        padding: 1rem;
+
+        .hand {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+
+    .boardGrid {
+        flex-direction: column; // Motif au dessus du Mur
+        align-items: center;
+        gap: 15px;
+    }
+
+    .line {
+        justify-content: center; // Centrage sur mobile
+    }
+
+    // Réduction de la taille des tuiles pour que ça tienne sur un écran de téléphone
+    .slot,
+    .cell,
+    .floorSlot {
+        width: $tile-size-mobile;
+        height: $tile-size-mobile;
+    }
+
+    .line {
+        height: $tile-size-mobile;
+    }
+
+    .factories {
+        gap: 15px;
+    }
+
+    .factory {
+        width: 90px;
+        height: 90px;
+        padding: 10px;
+    }
+}
+
+// Gestion des modales sur mobile
+@media (max-width: 480px) {
+    .resultsContainer {
+        flex-direction: column;
+    }
+
+    .bagModal,
+    .finalModal {
+        width: 90%;
+        padding: 1.5rem;
     }
 }
