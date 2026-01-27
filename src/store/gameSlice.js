@@ -1,70 +1,124 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { STONE_TYPES, FACTORY_COUNT, TILES_PER_FACTORY } from "../constants";
+import { STONE_TYPES, FACTORY_COUNT } from "../constants";
+
+const createEmptyPlayer = (id) => ({
+  id,
+  patternLines: Array(5)
+    .fill(null)
+    .map((_, i) => Array(i + 1).fill(null)),
+  wall: Array(5)
+    .fill(null)
+    .map(() => Array(5).fill(null)),
+  floorLine: [],
+  score: 0,
+});
 
 const initialState = {
-  factories: [], // Tableau de tableaux de pierres
-  center: [], // Pierres au centre de la table
-  players: [
-    {
-      id: 1,
-      patternLines: [
-        [null],
-        [null, null],
-        [null, null, null],
-        [null, null, null, null],
-        [null, null, null, null, null],
-      ],
-      wall: Array(5)
-        .fill(null)
-        .map(() => Array(5).fill(null)),
-      floorLine: [],
-      score: 0,
-    },
-  ],
+  factories: [],
+  center: [],
+  players: [],
   currentPlayerId: 1,
-  gameState: "LOBBY", // LOBBY, PLAYING, ROUND_END, GAME_OVER
+  heldStones: null,
+  gameState: "LOBBY",
 };
 
 const gameSlice = createSlice({
   name: "game",
   initialState,
   reducers: {
-    initGame: (state, action) => {
-      const { playerCount } = action.payload;
+    initGame: (state) => {
+      const playerCount = 2;
       const numFactories = FACTORY_COUNT[playerCount];
-      // Logique pour remplir les fabriques avec des pierres aléatoires
+
       state.factories = Array(numFactories)
         .fill([])
         .map(() =>
-          Array(TILES_PER_FACTORY)
+          Array(4)
             .fill(null)
             .map(() => {
               const types = Object.values(STONE_TYPES);
               return types[Math.floor(Math.random() * types.length)];
             }),
         );
+
+      state.players = [createEmptyPlayer(1), createEmptyPlayer(2)];
+      state.center = [];
+      state.currentPlayerId = 1;
+      state.heldStones = null;
       state.gameState = "PLAYING";
     },
+
     pickFromFactory: (state, action) => {
       const { factoryIndex, stoneType } = action.payload;
       const factory = state.factories[factoryIndex];
 
-      // 1. On prend les pierres de la couleur choisie
-      const pickedStones = factory.filter((s) => s === stoneType);
+      const picked = factory.filter((s) => s === stoneType);
+      const remaining = factory.filter((s) => s !== stoneType);
 
-      // 2. On envoie le reste au centre
-      const remainingStones = factory.filter((s) => s !== stoneType);
-      state.center.push(...remainingStones);
-
-      // 3. On vide la fabrique
+      state.center.push(...remaining);
       state.factories[factoryIndex] = [];
-
-      // 4. Stocker temporairement les pierres piochées pour le placement
-      state.heldStones = pickedStones;
+      state.heldStones = { type: stoneType, count: picked.length };
     },
-    // Ajoutez ici les actions pour piocher une pierre, etc.
+
+    pickFromCenter: (state, action) => {
+      const { stoneType } = action.payload;
+      const picked = state.center.filter((s) => s === stoneType);
+      const remaining = state.center.filter((s) => s !== stoneType);
+
+      state.center = remaining;
+      state.heldStones = { type: stoneType, count: picked.length };
+    },
+
+    placeStones: (state, action) => {
+      const { lineIndex } = action.payload;
+      if (!state.heldStones) return;
+
+      const player = state.players.find((p) => p.id === state.currentPlayerId);
+      const { type, count } = state.heldStones;
+      const line = player.patternLines[lineIndex];
+
+      const isLineEmpty = line.every((slot) => slot === null);
+      const isSameType = line.find((slot) => slot !== null) === type;
+      const rowInWall = player.wall[lineIndex];
+      const alreadyInWall = rowInWall.includes(type);
+
+      if ((isLineEmpty || isSameType) && !alreadyInWall) {
+        let remaining = count;
+
+        for (let i = 0; i < line.length; i++) {
+          if (line[i] === null && remaining > 0) {
+            line[i] = type;
+            remaining--;
+          }
+        }
+
+        if (remaining > 0) {
+          for (let i = 0; i < remaining; i++) {
+            if (player.floorLine.length < 7) {
+              player.floorLine.push(type);
+            }
+          }
+        }
+
+        state.heldStones = null;
+        state.currentPlayerId = state.currentPlayerId === 1 ? 2 : 1;
+      }
+    },
+
+    nextTurn: (state) => {
+      state.currentPlayerId = state.currentPlayerId === 1 ? 2 : 1;
+      state.heldStones = null;
+    },
   },
 });
 
-export const { initGame } = gameSlice.actions;
+// CORRECTION ICI : Ajout de placeStones et pickFromCenter dans les exports
+export const {
+  initGame,
+  pickFromFactory,
+  pickFromCenter,
+  placeStones,
+  nextTurn,
+} = gameSlice.actions;
+
 export default gameSlice.reducer;
