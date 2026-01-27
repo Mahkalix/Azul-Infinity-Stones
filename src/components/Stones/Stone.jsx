@@ -13,11 +13,10 @@ import timeStone from "../../assets/stones/time.png";
 // Map stone types to their images
 const STONE_IMAGES = {
   [STONE_TYPES.MIND]: mindStone,
-  [STONE_TYPES.POWER]: powerStone,
   [STONE_TYPES.REALITY]: realityStone,
   [STONE_TYPES.SPACE]: spaceStone,
+  [STONE_TYPES.POWER]: powerStone,
   [STONE_TYPES.TIME]: timeStone,
-  // SOUL stone doesn't have an image yet, will use color fallback
 };
 
 export const Stone = ({ stoneType, size = "medium", className = "" }) => {
