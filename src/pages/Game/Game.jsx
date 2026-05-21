@@ -20,6 +20,7 @@ const Game = () => {
   const navigate = useNavigate();
   const [showBag, setShowBag] = useState(false);
   const [localPlayerNumber, setLocalPlayerNumber] = useState(null);
+  const [localPlayerRole, setLocalPlayerRole] = useState(null);
   const [roomPlayers, setRoomPlayers] = useState([]);
   const {
     factories,
@@ -30,47 +31,96 @@ const Game = () => {
     gameState,
     bag,
   } = useSelector((state) => state.game);
+  const isSpectator = localPlayerRole === "spectator";
+  const canPlay = Boolean(
+    localPlayerNumber && localPlayerNumber <= 2 && !isSpectator,
+  );
+  const headerTitle = isSpectator
+    ? "MODE SPECTATEUR"
+    : `TOUR : JOUEUR ${currentPlayerId}`;
 
   useEffect(() => {
     if (players.length === 0) dispatch(initGame());
   }, [dispatch, players]);
 
   useEffect(() => {
-    const handleWaitingForPlayer = ({ roomId, players: roomPlayers }) => {
-      console.log("En attente dans la room:", roomId, roomPlayers);
-      setRoomPlayers(roomPlayers || []);
-      const local = resolveLocalPlayer(roomPlayers);
-      if (local) {
-        setLocalPlayerNumber(local);
-        console.log(`Player ${local} connected`);
+    const resolveLocalState = (payload) => {
+      if (!payload || !socket?.id) return { playerNumber: null, role: null };
+
+      const members = Array.isArray(payload.members) ? payload.members : [];
+      const playersList = Array.isArray(payload.players) ? payload.players : [];
+      const spectatorsList = Array.isArray(payload.spectators)
+        ? payload.spectators
+        : [];
+
+      const member = members.find(
+        (entry) =>
+          entry.socketId === socket.id ||
+          entry.id === socket.id ||
+          entry.socket === socket.id,
+      );
+
+      if (member) {
+        const role = member.role === "spectator" ? "spectator" : "player";
+        const playerNumber =
+          role === "player"
+            ? playersList.indexOf(socket.id) + 1
+            : playersList.length + spectatorsList.indexOf(socket.id) + 1;
+
+        return {
+          playerNumber: playerNumber > 0 ? playerNumber : null,
+          role,
+        };
       }
+
+      const fallbackIndex = playersList.indexOf(socket.id);
+      if (fallbackIndex !== -1) {
+        return { playerNumber: fallbackIndex + 1, role: "player" };
+      }
+
+      const spectatorIndex = spectatorsList.indexOf(socket.id);
+      if (spectatorIndex !== -1) {
+        return {
+          playerNumber: playersList.length + spectatorIndex + 1,
+          role: "spectator",
+        };
+      }
+
+      return { playerNumber: null, role: null };
     };
 
-    const resolveLocalPlayer = (roomPlayers) => {
-      if (!roomPlayers || !socket?.id) return null;
-      if (roomPlayers.length === 0) return null;
-      const sid = socket.id;
-      if (typeof roomPlayers[0] === "string") {
-        const idx = roomPlayers.indexOf(sid);
-        return idx !== -1 ? idx + 1 : null;
-      }
-      if (typeof roomPlayers[0] === "object") {
-        const idx = roomPlayers.findIndex(
-          (p) => p.id === sid || p.socketId === sid || p.socket === sid,
+    const applyRoomState = (payload, sourceLabel) => {
+      const playersList = Array.isArray(payload?.players)
+        ? payload.players
+        : [];
+      setRoomPlayers(playersList);
+
+      const local = resolveLocalState(payload);
+      setLocalPlayerNumber(local.playerNumber);
+      setLocalPlayerRole(local.role);
+
+      if (local.playerNumber) {
+        console.log(
+          local.role === "spectator"
+            ? `Spectator ${local.playerNumber} connected via ${sourceLabel}`
+            : `Player ${local.playerNumber} connected via ${sourceLabel}`,
         );
-        return idx !== -1 ? idx + 1 : null;
       }
-      return null;
     };
 
-    const handleGameStart = ({ roomId, players: roomPlayers }) => {
-      console.log("La partie commence dans:", roomId, "avec", roomPlayers);
-      setRoomPlayers(roomPlayers || []);
-      const local = resolveLocalPlayer(roomPlayers);
-      if (local) {
-        setLocalPlayerNumber(local);
-        console.log(`Player ${local} connected`);
-      }
+    const handleWaitingForPlayer = (payload) => {
+      console.log("En attente dans la room:", payload?.roomId, payload);
+      applyRoomState(payload, "waiting_for_player");
+    };
+
+    const handleRoomState = (payload) => {
+      console.log("Etat room reçu:", payload?.roomId, payload);
+      applyRoomState(payload, "room_state");
+    };
+
+    const handleGameStart = (payload) => {
+      console.log("La partie commence dans:", payload?.roomId, payload);
+      applyRoomState(payload, "game_start");
     };
 
     const handleDisconnect = () => {
@@ -80,15 +130,28 @@ const Game = () => {
 
     socket.emit("join_game", { roomId: "ROOM-1" });
     socket.on("waiting_for_player", handleWaitingForPlayer);
+    socket.on("room_state", handleRoomState);
     socket.on("game_start", handleGameStart);
     socket.on("disconnect", handleDisconnect);
 
     return () => {
       socket.off("waiting_for_player", handleWaitingForPlayer);
+      socket.off("room_state", handleRoomState);
       socket.off("game_start", handleGameStart);
       socket.off("disconnect", handleDisconnect);
     };
   }, []);
+
+  const handleLeaveRoom = () => {
+    try {
+      socket.emit("leave_game", { roomId: "ROOM-1" });
+    } catch (e) {
+      console.warn("Failed to emit leave_game", e);
+    }
+    setLocalPlayerNumber(null);
+    setLocalPlayerRole(null);
+    navigate("/");
+  };
 
   // If server indicates lobby or room isn't full, show waiting room
   if (gameState === "LOBBY" || (roomPlayers && roomPlayers.length < 2)) {
@@ -188,14 +251,27 @@ const Game = () => {
   }
 
   return (
-    <div className={styles.gameContainer}>
+    <div
+      className={`${styles.gameContainer} ${isSpectator ? styles.spectatorMode : ""}`}
+    >
       <header className={styles.header}>
-        {localPlayerNumber && (
+        {localPlayerNumber && !isSpectator && (
           <div className={styles.localBadge}>
             Vous êtes le joueur {localPlayerNumber}
           </div>
         )}
-        <h1>TOUR : JOUEUR {currentPlayerId}</h1>
+        {isSpectator && (
+          <div className={styles.spectatorBanner}>
+            <span className={styles.spectatorLabel}>MODE SPECTATEUR</span>
+            <span className={styles.spectatorText}>
+              Lecture seule, vous ne pouvez pas jouer.
+            </span>
+            <Button variant="ghost" size="small" onClick={handleLeaveRoom}>
+              Quitter la room
+            </Button>
+          </div>
+        )}
+        <h1>{headerTitle}</h1>
         <div className={styles.controls}>
           <Button size="small" onClick={() => setShowBag(true)}>
             👜 Voir le Sac ({bag?.length || 0})
@@ -258,11 +334,15 @@ const Game = () => {
         <section className={styles.commonArea}>
           <div className={styles.factories}>
             {factories.map((stones, i) => (
-              <div key={i} className={styles.factory}>
+              <div
+                key={i}
+                className={`${styles.factory} ${isSpectator ? styles.readOnly : ""}`}
+              >
                 {stones.map((s, j) => (
                   <div
                     key={j}
                     onClick={() =>
+                      canPlay &&
                       !heldStones &&
                       dispatch(
                         pickFromFactory({ factoryIndex: i, stoneType: s }),
@@ -280,7 +360,9 @@ const Game = () => {
               <div
                 key={i}
                 onClick={() =>
-                  !heldStones && dispatch(pickFromCenter({ stoneType: s }))
+                  canPlay &&
+                  !heldStones &&
+                  dispatch(pickFromCenter({ stoneType: s }))
                 }
               >
                 <Stone stoneType={s} size="small" />
@@ -293,7 +375,7 @@ const Game = () => {
           {players.map((p) => (
             <div
               key={p.id}
-              className={`${styles.playerBoard} ${currentPlayerId === p.id ? styles.active : ""}`}
+              className={`${styles.playerBoard} ${currentPlayerId === p.id ? styles.active : ""} ${isSpectator ? styles.readOnly : ""}`}
             >
               <h3>
                 Joueur {p.id}{" "}

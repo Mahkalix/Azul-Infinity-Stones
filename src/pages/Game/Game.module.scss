@@ -10,6 +10,25 @@
   align-items: center;
 }
 
+.spectatorMode {
+  background:
+    radial-gradient(circle at top, rgba(255, 200, 50, 0.12), transparent 38%),
+    linear-gradient(180deg, rgba(18, 13, 5, 0.92), $bg-primary 55%);
+
+  .header {
+    border: 1px solid rgba(255, 200, 50, 0.18);
+    box-shadow:
+      0 0 0 1px rgba(255, 200, 50, 0.05),
+      0 12px 30px rgba(0, 0, 0, 0.35);
+  }
+
+  .mainLayout,
+  .commonArea,
+  .playersContainer {
+    opacity: 0.82;
+  }
+}
+
 .header {
   width: 100%;
   max-width: 1400px;
@@ -20,6 +39,7 @@
   background: rgba($bg-secondary, 0.5);
   border-radius: $radius-lg;
   margin-bottom: 2rem;
+  position: relative;
 
   .controls {
     display: flex;
@@ -42,6 +62,37 @@
   }
 }
 
+.spectatorBanner {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  margin-bottom: 14px;
+  border-radius: $radius-lg;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 193, 7, 0.22),
+    rgba(255, 193, 7, 0.08)
+  );
+  border: 1px solid rgba(255, 193, 7, 0.35);
+  color: #ffd54f;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.25);
+}
+
+.spectatorLabel {
+  font-size: 0.9rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.spectatorText {
+  flex: 1;
+  font-weight: 600;
+}
+
 .localBadge {
   background: $color-primary;
   color: $bg-primary;
@@ -50,6 +101,54 @@
   font-weight: 700;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
   margin-right: 12px;
+}
+
+.spectatorBadge {
+  margin-top: 10px;
+  padding: 8px 14px;
+  border-radius: $radius-md;
+  border: 1px solid rgba($color-primary-light, 0.35);
+  background: rgba($color-primary-light, 0.12);
+  color: $color-primary-light;
+  font-weight: 700;
+}
+
+.readOnly {
+  cursor: not-allowed !important;
+  opacity: 0.92;
+
+  * {
+    cursor: not-allowed !important;
+  }
+}
+
+.spectatorOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  z-index: 4000;
+  pointer-events: none;
+}
+
+.spectatorContent {
+  pointer-events: auto;
+  margin: 12px auto;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 165, 0, 0.12),
+    rgba(255, 200, 50, 0.06)
+  );
+  color: $color-primary-dark;
+  padding: 10px 18px;
+  border-radius: $radius-lg;
+  border: 1px solid rgba(255, 165, 0, 0.18);
+  font-weight: 800;
+  display: flex;
+  gap: 12px;
+  align-items: center;
 }
 
 .youTag {
@@ -134,6 +233,12 @@
 
   &:hover {
     transform: scale(1.05);
+  }
+
+  &.readOnly,
+  .readOnly & {
+    transform: none;
+    box-shadow: 0 0 15px rgba($color-primary, 0.15);
   }
 
   @media (max-width: 768px) {
