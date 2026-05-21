@@ -7,17 +7,20 @@ import {
   pickFromFactory,
   pickFromCenter,
   placeStones,
+  resetToLobby,
 } from "../../store/gameSlice";
 import { STONE_TYPES } from "../../constants";
 import { socket } from "../../constants/socket";
 import styles from "./Game.module.scss";
 import { Button } from "../../components/Button";
+import WaitingRoom from "../../components/WaitingRoom";
 
 const Game = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [showBag, setShowBag] = useState(false);
   const [localPlayerNumber, setLocalPlayerNumber] = useState(null);
+  const [roomPlayers, setRoomPlayers] = useState([]);
   const {
     factories,
     center,
@@ -35,6 +38,7 @@ const Game = () => {
   useEffect(() => {
     const handleWaitingForPlayer = ({ roomId, players: roomPlayers }) => {
       console.log("En attente dans la room:", roomId, roomPlayers);
+      setRoomPlayers(roomPlayers || []);
       const local = resolveLocalPlayer(roomPlayers);
       if (local) {
         setLocalPlayerNumber(local);
@@ -61,6 +65,7 @@ const Game = () => {
 
     const handleGameStart = ({ roomId, players: roomPlayers }) => {
       console.log("La partie commence dans:", roomId, "avec", roomPlayers);
+      setRoomPlayers(roomPlayers || []);
       const local = resolveLocalPlayer(roomPlayers);
       if (local) {
         setLocalPlayerNumber(local);
@@ -85,7 +90,15 @@ const Game = () => {
     };
   }, []);
 
-  if (players.length === 0) return null;
+  // If server indicates lobby or room isn't full, show waiting room
+  if (gameState === "LOBBY" || (roomPlayers && roomPlayers.length < 2)) {
+    return (
+      <WaitingRoom
+        roomPlayers={roomPlayers}
+        localPlayerNumber={localPlayerNumber}
+      />
+    );
+  }
 
   const bagStats = (bag || []).reduce((acc, s) => {
     acc[s] = (acc[s] || 0) + 1;
@@ -163,7 +176,6 @@ const Game = () => {
                     </div>
                   ))}
                 </div>
-                <p>Score final : {p.score}</p>
               </div>
             ))}
           </div>
@@ -183,10 +195,33 @@ const Game = () => {
             Vous êtes le joueur {localPlayerNumber}
           </div>
         )}
-        <h1>TOUR : HÉRO {currentPlayerId}</h1>
-        <Button size="small" onClick={() => setShowBag(true)}>
-          👜 Voir le Sac ({bag?.length || 0})
-        </Button>
+        <h1>TOUR : JOUEUR {currentPlayerId}</h1>
+        <div className={styles.controls}>
+          <Button size="small" onClick={() => setShowBag(true)}>
+            👜 Voir le Sac ({bag?.length || 0})
+          </Button>
+          <Button
+            variant="ghost"
+            size="small"
+            onClick={() => {
+              if (
+                window.confirm(
+                  "Réinitialiser la partie ? Toutes les données locales seront perdues.",
+                )
+              ) {
+                dispatch(resetToLobby());
+                setLocalPlayerNumber(null);
+                try {
+                  socket.emit("reset_game", { roomId: "ROOM-1" });
+                } catch (e) {
+                  console.warn("Socket emit failed on reset:", e);
+                }
+              }
+            }}
+          >
+            Réinitialiser la partie
+          </Button>
+        </div>
         {heldStones && (
           <div className={styles.hand}>
             Main: {heldStones.count}x{" "}
@@ -261,7 +296,11 @@ const Game = () => {
               className={`${styles.playerBoard} ${currentPlayerId === p.id ? styles.active : ""}`}
             >
               <h3>
-                Joueur {p.id} {p.id === localPlayerNumber && <span className={styles.youTag}>— Vous</span>} | Score: {p.score}
+                Joueur {p.id}{" "}
+                {p.id === localPlayerNumber && (
+                  <span className={styles.youTag}>— Vous</span>
+                )}{" "}
+                | Score: {p.score}
               </h3>
               <div className={styles.boardGrid}>
                 <div className={styles.patterns}>

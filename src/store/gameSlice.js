@@ -154,8 +154,21 @@ const gameSlice = createSlice({
         state.currentPlayerId = state.currentPlayerId === 1 ? 2 : 1;
       }
     }
+,
+    resetToLobby: (state) => {
+      state.factories = [];
+      state.center = [];
+      state.players = [];
+      state.currentPlayerId = 1;
+      state.nextFirstPlayerId = 1;
+      state.heldStones = null;
+      state.firstStonePicked = false;
+      state.gameState = "LOBBY";
+      state.bag = [];
+      state.discard = [];
+    }
   },
 });
 
-export const { initGame, pickFromFactory, pickFromCenter, placeStones } = gameSlice.actions;
+export const { initGame, pickFromFactory, pickFromCenter, placeStones, resetToLobby } = gameSlice.actions;
 export default gameSlice.reducer;
