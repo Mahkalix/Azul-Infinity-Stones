@@ -5,7 +5,7 @@ import Rules from "./pages/Rules/Rules";
 import Game from "./pages/Game/Game";
 import SocketDemo from "./pages/SocketDemo/SocketDemo";
 
-function App() {
+function App(): JSX.Element {
   return (
     <BrowserRouter>
       <div className="app">

@@ -9,13 +9,22 @@ import {
   placeStones,
 } from "../../store/gameSlice";
 import { STONE_TYPES } from "../../constants";
+import { socket } from "../../constants/socket";
 import styles from "./Game.module.scss";
 import { Button } from "../../components/Button";
+import WaitingRoom from "../../components/WaitingRoom";
+
+const ROOM_ID = "ROOM-1";
 
 const Game = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [showBag, setShowBag] = useState(false);
+  const [showRoomModal, setShowRoomModal] = useState(true);
+  const [roomId, setRoomId] = useState(ROOM_ID);
+  const [roomStatus, setRoomStatus] = useState("Rejoins ROOM-1 pour lancer la partie.");
+  const [roomPlayers, setRoomPlayers] = useState([]);
+  const [localPlayerNumber, setLocalPlayerNumber] = useState(null);
   const {
     factories,
     center,
@@ -29,6 +38,74 @@ const Game = () => {
   useEffect(() => {
     if (players.length === 0) dispatch(initGame());
   }, [dispatch, players]);
+
+  useEffect(() => {
+    const handleWaitingForPlayer = ({ roomId, players }) => {
+      setRoomStatus(`En attente dans la room ${roomId}`);
+      if (Array.isArray(players)) {
+        setRoomPlayers(players);
+        if (players.length >= 1) console.log("Player 1 connected");
+        if (players.length >= 2) console.log("Player 2 connected");
+
+        const idx = players.indexOf(socket.id);
+        if (idx !== -1) {
+          const num = idx + 1;
+          setLocalPlayerNumber(num);
+          console.log(`You are player ${num}`);
+        } else {
+          setLocalPlayerNumber(null);
+        }
+      }
+    };
+
+    const handleGameStart = ({ roomId, players: roomPlayers }) => {
+      setRoomId(roomId);
+      setRoomPlayers(roomPlayers || []);
+      setRoomStatus(`La partie commence dans ${roomId}`);
+      setShowRoomModal(false);
+      if (Array.isArray(roomPlayers)) {
+        if (roomPlayers.length >= 1) console.log("Player 1 connected");
+        if (roomPlayers.length >= 2) console.log("Player 2 connected");
+        const idx = roomPlayers.indexOf(socket.id);
+        if (idx !== -1) {
+          const num = idx + 1;
+          setLocalPlayerNumber(num);
+          console.log(`You are player ${num}`);
+        }
+      }
+    };
+
+    const handleDisconnect = () => {
+      setRoomStatus("Déconnecté du serveur socket.");
+      setShowRoomModal(true);
+      setLocalPlayerNumber(null);
+    };
+
+    socket.on("waiting_for_player", handleWaitingForPlayer);
+    socket.on("game_start", handleGameStart);
+    socket.on("disconnect", handleDisconnect);
+
+    return () => {
+      socket.off("waiting_for_player", handleWaitingForPlayer);
+      socket.off("game_start", handleGameStart);
+      socket.off("disconnect", handleDisconnect);
+    };
+  }, []);
+
+  const handleCreateRoom = () => {
+    setRoomId(ROOM_ID);
+    setRoomStatus(`Connexion à la room ${ROOM_ID}...`);
+    socket.emit("join_game", { roomId: ROOM_ID });
+  };
+
+  const handleCloseRoomModal = () => {
+    if (roomPlayers.length >= 2) {
+      setShowRoomModal(false);
+      return;
+    }
+
+    setRoomStatus("Attend qu'un second joueur rejoigne la room.");
+  };
 
   if (players.length === 0) return null;
 
@@ -122,8 +199,21 @@ const Game = () => {
 
   return (
     <div className={styles.gameContainer}>
+      <WaitingRoom
+        isOpen={showRoomModal}
+        roomId={roomId}
+        roomStatus={roomStatus}
+        roomPlayers={roomPlayers}
+        onJoinRoom={handleCreateRoom}
+        onContinue={handleCloseRoomModal}
+        localPlayerNumber={localPlayerNumber}
+      />
+
       <header className={styles.header}>
         <h1>TOUR : HÉRO {currentPlayerId}</h1>
+        <div className={styles.roomBadge}>
+          {roomId ? `Room: ${roomId}` : "Aucune room"}
+        </div>
         <Button size="small" onClick={() => setShowBag(true)}>
           👜 Voir le Sac ({bag?.length || 0})
         </Button>
