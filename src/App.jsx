@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home/Home";
 import Rules from "./pages/Rules/Rules";
 import Game from "./pages/Game/Game";
+import SocketDemo from "./pages/SocketDemo/SocketDemo";
 
 function App() {
   return (
@@ -10,6 +11,7 @@ function App() {
       <div className="app">
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/socket" element={<SocketDemo />} />
           <Route path="/rules" element={<Rules />} />
           <Route path="/game" element={<Game />} />
         </Routes>

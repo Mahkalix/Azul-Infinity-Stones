@@ -1,0 +1,65 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 3000;
+}
+
+.modal {
+  background: rgba(10, 14, 20, 0.95);
+  color: #fff;
+  padding: 2rem;
+  border-radius: 12px;
+  width: 380px;
+  text-align: center;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.count {
+  margin: 8px 0 16px 0;
+  font-weight: 700;
+}
+
+.spectatorBadge {
+  margin: 0 auto 16px;
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #ffd166;
+  font-weight: 700;
+  width: fit-content;
+}
+
+.playerList {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 16px 0;
+}
+
+.playerItem {
+  padding: 8px 0;
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.04);
+}
+
+.you {
+  color: #ffd166;
+  font-weight: 700;
+  margin-left: 6px;
+}
+
+.waitingText {
+  margin-top: 12px;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 12px;
+  align-items: center;
+}
