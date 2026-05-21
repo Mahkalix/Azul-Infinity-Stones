@@ -12,18 +12,11 @@ import { STONE_TYPES } from "../../constants";
 import { socket } from "../../constants/socket";
 import styles from "./Game.module.scss";
 import { Button } from "../../components/Button";
-import WaitingRoom from "../../components/WaitingRoom";
-
-const ROOM_ID = "ROOM-1";
 
 const Game = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [showBag, setShowBag] = useState(false);
-  const [showRoomModal, setShowRoomModal] = useState(true);
-  const [roomId, setRoomId] = useState(ROOM_ID);
-  const [roomStatus, setRoomStatus] = useState("Rejoins ROOM-1 pour lancer la partie.");
-  const [roomPlayers, setRoomPlayers] = useState([]);
   const [localPlayerNumber, setLocalPlayerNumber] = useState(null);
   const {
     factories,
@@ -40,47 +33,47 @@ const Game = () => {
   }, [dispatch, players]);
 
   useEffect(() => {
-    const handleWaitingForPlayer = ({ roomId, players }) => {
-      setRoomStatus(`En attente dans la room ${roomId}`);
-      if (Array.isArray(players)) {
-        setRoomPlayers(players);
-        if (players.length >= 1) console.log("Player 1 connected");
-        if (players.length >= 2) console.log("Player 2 connected");
-
-        const idx = players.indexOf(socket.id);
-        if (idx !== -1) {
-          const num = idx + 1;
-          setLocalPlayerNumber(num);
-          console.log(`You are player ${num}`);
-        } else {
-          setLocalPlayerNumber(null);
-        }
+    const handleWaitingForPlayer = ({ roomId, players: roomPlayers }) => {
+      console.log("En attente dans la room:", roomId, roomPlayers);
+      const local = resolveLocalPlayer(roomPlayers);
+      if (local) {
+        setLocalPlayerNumber(local);
+        console.log(`Player ${local} connected`);
       }
     };
 
+    const resolveLocalPlayer = (roomPlayers) => {
+      if (!roomPlayers || !socket?.id) return null;
+      if (roomPlayers.length === 0) return null;
+      const sid = socket.id;
+      if (typeof roomPlayers[0] === "string") {
+        const idx = roomPlayers.indexOf(sid);
+        return idx !== -1 ? idx + 1 : null;
+      }
+      if (typeof roomPlayers[0] === "object") {
+        const idx = roomPlayers.findIndex(
+          (p) => p.id === sid || p.socketId === sid || p.socket === sid,
+        );
+        return idx !== -1 ? idx + 1 : null;
+      }
+      return null;
+    };
+
     const handleGameStart = ({ roomId, players: roomPlayers }) => {
-      setRoomId(roomId);
-      setRoomPlayers(roomPlayers || []);
-      setRoomStatus(`La partie commence dans ${roomId}`);
-      setShowRoomModal(false);
-      if (Array.isArray(roomPlayers)) {
-        if (roomPlayers.length >= 1) console.log("Player 1 connected");
-        if (roomPlayers.length >= 2) console.log("Player 2 connected");
-        const idx = roomPlayers.indexOf(socket.id);
-        if (idx !== -1) {
-          const num = idx + 1;
-          setLocalPlayerNumber(num);
-          console.log(`You are player ${num}`);
-        }
+      console.log("La partie commence dans:", roomId, "avec", roomPlayers);
+      const local = resolveLocalPlayer(roomPlayers);
+      if (local) {
+        setLocalPlayerNumber(local);
+        console.log(`Player ${local} connected`);
       }
     };
 
     const handleDisconnect = () => {
-      setRoomStatus("Déconnecté du serveur socket.");
-      setShowRoomModal(true);
+      console.log("Déconnecté");
       setLocalPlayerNumber(null);
     };
 
+    socket.emit("join_game", { roomId: "ROOM-1" });
     socket.on("waiting_for_player", handleWaitingForPlayer);
     socket.on("game_start", handleGameStart);
     socket.on("disconnect", handleDisconnect);
@@ -91,21 +84,6 @@ const Game = () => {
       socket.off("disconnect", handleDisconnect);
     };
   }, []);
-
-  const handleCreateRoom = () => {
-    setRoomId(ROOM_ID);
-    setRoomStatus(`Connexion à la room ${ROOM_ID}...`);
-    socket.emit("join_game", { roomId: ROOM_ID });
-  };
-
-  const handleCloseRoomModal = () => {
-    if (roomPlayers.length >= 2) {
-      setShowRoomModal(false);
-      return;
-    }
-
-    setRoomStatus("Attend qu'un second joueur rejoigne la room.");
-  };
 
   if (players.length === 0) return null;
 
@@ -199,21 +177,13 @@ const Game = () => {
 
   return (
     <div className={styles.gameContainer}>
-      <WaitingRoom
-        isOpen={showRoomModal}
-        roomId={roomId}
-        roomStatus={roomStatus}
-        roomPlayers={roomPlayers}
-        onJoinRoom={handleCreateRoom}
-        onContinue={handleCloseRoomModal}
-        localPlayerNumber={localPlayerNumber}
-      />
-
       <header className={styles.header}>
+        {localPlayerNumber && (
+          <div className={styles.localBadge}>
+            Vous êtes le joueur {localPlayerNumber}
+          </div>
+        )}
         <h1>TOUR : HÉRO {currentPlayerId}</h1>
-        <div className={styles.roomBadge}>
-          {roomId ? `Room: ${roomId}` : "Aucune room"}
-        </div>
         <Button size="small" onClick={() => setShowBag(true)}>
           👜 Voir le Sac ({bag?.length || 0})
         </Button>
@@ -291,7 +261,7 @@ const Game = () => {
               className={`${styles.playerBoard} ${currentPlayerId === p.id ? styles.active : ""}`}
             >
               <h3>
-                Joueur {p.id} | Score: {p.score}
+                Joueur {p.id} {p.id === localPlayerNumber && <span className={styles.youTag}>— Vous</span>} | Score: {p.score}
               </h3>
               <div className={styles.boardGrid}>
                 <div className={styles.patterns}>
